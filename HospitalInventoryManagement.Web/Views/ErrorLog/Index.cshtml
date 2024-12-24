@@ -1,0 +1,45 @@
+﻿@model IEnumerable<HospitalInventoryManagement.Data.Models.ErrorLogs>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Hata Yönetimi";
+}
+<h1>Hata Logları</h1>
+
+@if (!Model.Any())
+{
+    <p class="text-success">Şu anda herhangi bir hata kaydı bulunmamaktadır.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Hata Mesajı</th>
+                <th>Zaman</th>
+                <th>Detaylar</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var log in Model)
+            {
+                <tr>
+                    <td>@log.Id</td>
+                    <td>@log.ErrorMessage</td>
+                    <td>@log.LogTime.ToString("dd-MM-yyyy HH:mm:ss")</td>
+                    <td>
+                        <button class="btn btn-info btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#stackTrace-@log.Id">
+                            Görüntüle
+                        </button>
+                    </td>
+                </tr>
+                <tr class="collapse" id="stackTrace-@log.Id">
+                    <td colspan="4">
+                        <pre>@log.StackTrace</pre>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

@@ -1,0 +1,41 @@
+﻿@model IEnumerable<HospitalInventoryManagement.Web.ViewModel.AdminMessageViewModel>
+
+@{
+    ViewData["Title"] = "Mesajlar";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Gelen Mesajlar</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Hastane Adı</th>
+            <th>Konu</th>
+            <th>Mesaj</th>
+            <th>Tarih</th>
+            <th>İşlemler</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var message in Model)
+        {
+            <tr class="@(message.IsRead ? "" : "table-warning")">
+                <td>@message.HospitalName</td>
+                <td>@message.Subject</td>
+                <td>@message.Content</td>
+                <td>@message.SentDate.ToString("dd.MM.yyyy HH:mm")</td>
+                <td>
+                    <form asp-action="MarkAsRead" method="post" style="display: inline;">
+                        <input type="hidden" name="id" value="@message.MessageID" />
+                        <button type="submit" class="btn btn-success" @(message.IsRead ? "disabled" : "")>Okundu</button>
+                    </form>
+                    <form asp-action="Delete" method="post" style="display: inline;">
+                        <input type="hidden" name="id" value="@message.MessageID" />
+                        <button type="submit" class="btn btn-danger">Sil</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

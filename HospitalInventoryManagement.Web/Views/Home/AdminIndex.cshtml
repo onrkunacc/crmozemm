@@ -1,0 +1,44 @@
+﻿@model HospitalInventoryManagement.Web.ViewModel.AdminStockListViewModel
+@{
+    ViewData["Title"] = "Anasayfa";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Hastane Stok Takip</h1>
+<br />
+<form method="get">
+    <label for="hospitalId" class="form-label">Hastane Seç:</label>
+    <select name="hospitalId" asp-for="SelectedHospitalID" asp-items="Model.Hospitals" onchange="this.form.submit()" class="form-control">
+        <option value="">Tüm Hastaneler</option>
+    </select>
+    <br />
+    <label for="sortOrder" class="form-label">Sıralama:</label>
+    <button class="btn btn-outline-dark" type="submit" name="sortOrder" value="NameAsc"><strong>Ürün Adı ↑</strong></button>&nbsp;
+    <button class="btn btn-outline-dark" type="submit" name="sortOrder" value="NameDesc"><strong>Ürün Adı ↓</strong></button>&nbsp;
+    <button class="btn btn-outline-dark" type="submit" name="sortOrder" value="DateAsc"><strong>Tarih ↑</strong></button>&nbsp;
+    <button class="btn btn-outline-dark" type="submit" name="sortOrder" value="DateDesc"><strong>Tarih ↓</strong></button>
+</form>
+<br />
+<table class="table">
+    <thead>
+        <tr>
+            <th>Ürün Adı</th>
+            <th>Hastane Adı</th>
+            <th>Adet</th>
+            <th>Son Güncellenme</th>
+            <th>Son Kullanma Tarihi</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var stock in Model.Stocks)
+        {
+            <tr>
+                <td>@stock.ProductName</td>
+                <td>@stock.HospitalName</td>
+                <td>@stock.Quantity</td>
+                <td>@stock.LastUpdated.ToString("dd.MM.yyyy")</td>
+                <td>@stock.ExpiryDate.ToString("dd.MM.yyyy")</td>
+            </tr>
+        }
+    </tbody>
+</table>

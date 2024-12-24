@@ -1,0 +1,51 @@
+﻿@model HospitalInventoryManagement.Web.ViewModel.MonthlyStatisticsViewModel
+
+@{
+    ViewData["Title"] = "İstatistik";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var successMessage = TempData["SuccessMessage"] as string;
+    var errorMessage = TempData["ErrorMessage"] as string;
+}
+@if (!string.IsNullOrEmpty(successMessage))
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @successMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @errorMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="container-fluid">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <h1 class="card-title fw-semibold mb-4">Aylık İstatistik Giriş</h1>
+                <div class="card">
+                    <div class="card-body">
+                        <form asp-action="EnterMonthlyStatistics" method="post">
+                            <div class="mb-3">
+                                <label asp-for="TestName" class="form-label">Test Adı</label>
+                                <input asp-for="TestName" class="form-control" />
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="TestCount" class="form-label">Test Sayısı</label>
+                                <input asp-for="TestCount" class="form-control" />
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="Month" class="form-label">Ay</label>
+                                <input asp-for="Month" type="month" class="form-control" />
+                            </div>
+                            <button type="submit" class="btn btn-primary m-1">Kaydet</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

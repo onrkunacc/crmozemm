@@ -1,0 +1,93 @@
+﻿@model IPagedList<HospitalInventoryManagement.Data.Models.Product>
+
+@{
+    ViewData["Title"] = "Ürün Listesi";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Ürün Listesi</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary m-1">Yeni Ürün Girişi</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Ürün Adı</th>
+            <th>Referans Numarası</th>
+            <th>Kutu Test Adeti</th>
+            <th>Flakon Sayısı</th>
+            <th>Kategori</th>
+            <th>Ürün Tipi</th>
+            <th>Platform</th>
+            <th>İşlemler</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.ProductName</td>
+                <td>@item.ReferenceNumber</td>
+                <td>@item.BoxTextCount</td>
+                <td>@item.FlaconCountPerBox</td>
+                <td>@item.Category?.CategoryName</td>
+                <td>@item.ProductType?.TypeName</td>
+                <td>@item.Platform?.PlatformName</td>
+                <td>
+                    <div class="btn-group" role="group">
+                        <a asp-action="Edit" asp-route-id="@item.ProductID" class="btn btn-warning btn-sm">Düzenle</a>
+                        <a asp-action="Details" asp-route-id="@item.ProductID" class="btn btn-info btn-sm">Detaylar</a>
+                        <a asp-action="Delete" asp-route-id="@item.ProductID" class="btn btn-danger btn-sm">Sil</a>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="d-flex justify-content-center mt-4">
+    @Html.PagedListPager(Model, page => Url.Action("Index", new { page }), new PagedListRenderOptions
+{
+    DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+    DisplayLinkToNextPage = PagedListDisplayMode.Always,
+    DisplayLinkToFirstPage = PagedListDisplayMode.Never,
+    DisplayLinkToLastPage = PagedListDisplayMode.Never,
+    MaximumPageNumbersToDisplay = 5,
+    Display = PagedListDisplayMode.IfNeeded,
+    LinkToNextPageFormat = "Sonraki",
+    LinkToPreviousPageFormat = "Önceki"
+})
+</div>
+
+<style>
+    .pagination li {
+        display: inline-block;
+        margin: 0 5px;
+    }
+
+        .pagination li.active a {
+            font-weight: bold;
+            color: #fff;
+            background-color: #007bff;
+            border-radius: 4px;
+            padding: 6px 12px;
+        }
+
+    .pagination a {
+        padding: 6px 12px;
+        text-decoration: none;
+        color: #007bff;
+        border: 1px solid #007bff;
+        border-radius: 4px;
+    }
+
+        .pagination a:hover {
+            background-color: #e9ecef;
+        }
+
+    .btn-group .btn {
+        margin: 0 2px;
+    }
+</style>

@@ -1,0 +1,46 @@
+﻿@using HospitalInventoryManagement.Data.Context
+@inject UserManager<ApplicationUser> UserManager
+@inject ApplicationDbContext Context
+
+@{
+    var user = await UserManager.GetUserAsync(User);
+    string hospitalName = "Bilinmiyor";
+
+    if (user != null)
+    {
+        var isAdmin = await UserManager.IsInRoleAsync(user, "Admin");
+        hospitalName = isAdmin
+            ? "Admin"
+            : Context.Hospitals.FirstOrDefault(h => h.HospitalID == user.HospitalID)?.HospitalName ?? "Hastane Bilgisi Bulunamadı";
+    }
+}
+
+<div class="d-flex justify-content-end align-items-center">
+    <!-- Dinamik saat -->
+    <div id="currentTime" class="me-3" style="font-weight: bold; font-size: 1rem;"></div>
+
+    <!-- Aktif Kullanıcı -->
+    <span class="me-3">Aktif Kullanıcı: <strong>@hospitalName</strong></span>
+
+    <!-- Çıkış Yap butonu -->
+    <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+        <button type="submit" class="btn btn-outline-dark"><i class="ti ti-logout"></i> Çıkış Yap</button>
+    </form>
+</div>
+
+<script>
+    function updateClock() {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        const timeString = `${hours}:${minutes}:${seconds}`;
+        document.getElementById("currentTime").innerText = timeString;
+    }
+
+    // Saati her saniye güncelle
+    setInterval(updateClock, 1000);
+
+    // İlk saati hemen göster
+    updateClock();
+</script>

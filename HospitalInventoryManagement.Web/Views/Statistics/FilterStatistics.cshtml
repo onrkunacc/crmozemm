@@ -1,0 +1,35 @@
+﻿@model HospitalInventoryManagement.Web.ViewModel.MonthlyStatisticsFilterViewModel
+
+@{
+    ViewData["Title"] = "İstatistik";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <h1 class="card-title fw-semibold mb-4">İstatistik Filtreleme</h1>
+                <div class="card">
+                    <div class="card-body">
+                        <form asp-action="FilterStatistics" method="post">
+                            <div class="mb-3">
+                                <label asp-for="HospitalID" class="form-label">Hastane</label>
+                                <select asp-for="HospitalID" asp-items="ViewBag.Hospitals" class="form-control"></select>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="StartMonth" class="form-label">Başlangıç Ayı</label>
+                                <input asp-for="StartMonth" type="month" class="form-control" />
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="EndMonth" class="form-label">Bitiş Ayı</label>
+                                <input asp-for="EndMonth" type="month" class="form-control" />
+                            </div>
+                            <button type="submit" class="btn btn-primary m-1">Filtrele</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

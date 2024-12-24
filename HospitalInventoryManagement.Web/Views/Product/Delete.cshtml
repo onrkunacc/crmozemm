@@ -1,0 +1,26 @@
+﻿@model HospitalInventoryManagement.Data.Models.Product
+@{
+    ViewData["Title"] = "Sil";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="alert alert-danger">
+    <h4>Ürünü silmek istediğinizden emin misiniz ?</h4>
+</div>
+
+<div>
+    <p><strong>Ürün Adı :</strong> @Model.ProductName</p>
+    <p><strong>Referans Numarası :</strong> @Model.ReferenceNumber</p>
+    <p><strong>Lot Numarası :</strong> @Model.LotNumber</p>
+    <p><strong>Kutu Test Count :</strong> @Model.BoxTextCount</p>
+    <p><strong>Kategori :</strong> @Model.Category?.CategoryName</p>
+    <p><strong>Ürün Tipi :</strong> @Model.ProductType?.TypeName</p>
+    <p><strong>Platform :</strong> @Model.Platform?.PlatformName</p>
+
+</div>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="ProductID" />
+    <button type="submit" class="btn btn-danger">Sil</button>
+    <a asp-action="Index" class="btn btn-secondary">Vazgeç</a>
+</form>

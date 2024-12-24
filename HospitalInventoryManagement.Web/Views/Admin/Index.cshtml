@@ -1,0 +1,35 @@
+﻿@{
+    ViewData["Title"] = "Siparişler";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Siparişler</h1>
+
+@if (ViewBag.HtmlTable != null)
+{
+    <div>
+        @Html.Raw(ViewBag.HtmlTable)
+    </div>
+
+    @if (ViewBag.PageNumbers != null && ViewBag.PageNumbers.Count > 0)
+    {
+        <nav>
+            <ul class="pagination">
+                @foreach (var pageNum in ViewBag.PageNumbers)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("Index", "Siparisler", new { page = pageNum })">Sayfa @pageNum</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+    else
+    {
+        <p>Sayfa numaraları bulunamadı.</p>
+    }
+}
+else
+{
+    <p>Tablo yüklenemedi.</p>
+}

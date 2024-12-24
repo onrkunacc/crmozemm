@@ -1,0 +1,114 @@
+﻿@model HospitalInventoryManagement.Web.ViewModel.BarcodeStockTransactionViewModel
+
+@{
+    ViewData["Title"] = "Barkod Stok Girişi";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<h1>Stok Girişi - Barkod</h1>
+<head>
+    <style>
+        .alert-danger {
+            border: 1px solid #d9534f; /* Kırmızı kenarlık */
+            background-color: #f8d7da; /* Hafif kırmızı arka plan */
+            color: #842029; /* Koyu kırmızı metin */
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+            .alert-danger i {
+                font-size: 1.5rem; /* Ünlem işaretinin boyutu */
+                color: #d9534f; /* Ünlem işaretinin rengi */
+            }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <h1 class="card-title fw-semibold mb-4">Yeni Stok Girişi</h1>
+                <form asp-action="BarcodeStockEntry" method="post">
+                    <input type="hidden" id="referenceNumber" name="ReferenceNumber" />
+                    <input type="hidden" id="TransactionType" name="TransactionType" value="Giriş" />
+                    <div class="form-group">
+                        <label for="barcode" class="form-label">Barkod</label>
+                        <input type="text" id="barcode" name="Barcode" class="form-control" placeholder="Barkod Okutun" required />
+                    </div>
+                    <button type="button" class="btn btn-primary mt-2" onclick="fetchProductDetails()">Ürün Bilgilerini Getir</button>
+
+                    <div class="form-group mt-3">
+                        <label class="form-label">Ürün Adı</label>
+                        <input type="text" id="productName" name="ProductName" class="form-control" readonly />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Lot Numarası</label>
+                        <input type="text" id="lotNumber" name="LotNumber" class="form-control" />
+                    </div>
+                    <div class="alert alert-danger mt-2 d-flex align-items-center">
+                        <i class="ti ti-alert-circle me-2" style="font-size: 1.5rem; color: #d9534f;"></i>
+                        <span>Lot numarasının doğruluğunu kontrol ettiğinizden emin olun.</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Son Kullanma Tarihi</label>
+                        <input type="text" id="expiryDate" name="ExpiryDate" class="form-control" readonly />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Miktar</label>
+                        <input type="number" name="Quantity" class="form-control" placeholder="Miktar Girin" required />
+                    </div>
+                    <button type="submit" class="btn btn-success mt-3">Stok Girişi Yap</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+
+
+
+<script>
+    function fetchProductDetails() {
+        const barcode = document.getElementById('barcode').value;
+
+        if (!barcode) {
+            alert("Barkod alanı boş olamaz.");
+            return;
+        }
+
+        // AJAX ile barkod sorgulama
+        fetch(`/Stock/GetProductDetailsByBarcode?barcode=${barcode}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('productName').value = data.product.productName || "";
+                    document.getElementById('lotNumber').value = data.product.lotNumber || "";
+                    document.getElementById('expiryDate').value = data.product.expiryDate || "Bilinmiyor";
+
+                    document.getElementById('referenceNumber').value = data.product.referenceNumber || "";
+                } else {
+                    alert(data.message);
+                    document.getElementById('productName').value = "";
+                    document.getElementById('lotNumber').value = "";
+                    document.getElementById('expiryDate').value = "";
+                }
+            })
+            .catch(error => {
+                console.error("Bir hata oluştu:", error);
+                alert("Ürün bilgilerini getirirken bir hata oluştu.");
+            });
+    }
+</script>
+

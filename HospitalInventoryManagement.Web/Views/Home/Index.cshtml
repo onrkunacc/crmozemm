@@ -1,0 +1,75 @@
+﻿@model HomeViewModel
+@{
+    ViewData["Title"] = "Ana Sayfa";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <h1>Ana Sayfa</h1>
+
+    <!-- Stoğu Azalan Ürünler -->
+    <div class="card mt-4">
+        <div class="card-header">Stoğu Azalan Ürünler</div>
+        <div class="card-body">
+            <ul>
+                @foreach (var item in Model.LowStockItems)
+                {
+                    <li>@item.Product.ProductName - Miktar: @item.Quantity</li>
+                }
+            </ul>
+        </div>
+    </div>
+
+    <!-- Stok Grafik -->
+    <div class="card mt-4">
+        <div class="card-header">Stok Durumu</div>
+        <div class="card-body">
+            <canvas id="stockChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Stok verileri
+        var stockData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.StockData));
+
+        // Ürün adları ve stok miktarlarını hazırlama
+        var labels = stockData.map(stock => stock.ProductName); // Ürün adları
+        var data = stockData.map(stock => stock.Quantity); // Stok miktarları
+
+        // Chart.js ile grafik oluşturma
+        var ctx = document.getElementById('stockChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar', // Bar grafiği
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Stok Miktarları',
+                    data: data,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true // Y ekseni sıfırdan başlar
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    },
+                    title: {
+                        display: true,
+                        text: 'Hastane Stok Grafiği'
+                    }
+                }
+            }
+        });
+    });
+</script>

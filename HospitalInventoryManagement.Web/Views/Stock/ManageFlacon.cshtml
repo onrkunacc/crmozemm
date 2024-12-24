@@ -1,0 +1,45 @@
+﻿@model FlaconManagementViewModel
+
+@{
+    ViewData["Title"] = "Flakon Yönetim";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Flakon Giriş-Çıkış</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<form asp-action="ManageFlacon" method="post">
+    <input type="hidden" asp-for="StockID" />
+
+    <div class="mb-3">
+        <label asp-for="ProductName" class="form-label">Ürün Adı</label>
+        <input asp-for="ProductName" class="form-control" readonly />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="HospitalName" class="form-label">Hastane</label>
+        <input asp-for="HospitalName" class="form-control" readonly />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="CurrentFlaconCount" class="form-label">Mevcut Flakon Sayısı</label>
+        <input asp-for="CurrentFlaconCount" class="form-control" readonly />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ChangeAmount" class="form-label">Flakon Azalt</label>
+        <input asp-for="ChangeAmount" class="form-control" />
+        <span asp-validation-for="ChangeAmount" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Güncelle</button>
+    <a asp-action="Index" class="btn btn-secondary">Geri</a>
+</form>

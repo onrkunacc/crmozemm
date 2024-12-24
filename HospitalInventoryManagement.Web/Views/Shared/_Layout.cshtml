@@ -1,0 +1,246 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>@ViewData["Title"] - OZEM</title>
+	<link rel="shortcut icon" type="image/png" href="~/Modernize-1.0.0/src/assets/images/logos/logo.jpg" />
+	<link rel="stylesheet" href="~/Modernize-1.0.0/src/assets/css/styles.css" />
+	<link rel="stylesheet" href="~/css/site.css" />
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+</head>
+<body>
+	<div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
+		 data-sidebar-position="fixed" data-header-position="fixed">
+		<!-- Sidebar Start -->
+		<aside class="left-sidebar closed collapse d-md-block" id="sidebar">
+			<div>
+				<div class="brand-logo d-flex align-items-center justify-content-between">
+					<a href="@Url.Action("Index", "Home")" class="text-nowrap logo-img">
+						<img src="~/Modernize-1.0.0/src/assets/images/logos/logo.jpg" width="180" alt="" />
+					</a>
+					@*  <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
+                        <i class="ti ti-x fs-8"></i>
+                    </div> *@
+					<button class="btn btn-close d-md-none" data-bs-toggle="collapse" data-bs-target="#sidebar"></button>
+				</div>
+
+				<nav class="sidebar-nav scroll-sidebar" data-simplebar="">
+					<ul id="sidebarnav">
+						<li class="sidebar-item">
+							<a class="sidebar-link" href="@Url.Action("Index", "Home")" aria-expanded="false">
+								<span><i class="ti ti-home"></i></span>
+								<span class="hide-menu">Anasayfa</span>
+
+							</a>
+						</li>
+						@if (User.IsInRole("Admin"))
+						{
+							<li class="sidebar-item">
+								<a class="sidebar-link" href="@Url.Action("Index","Admin")" aria-expanded="false">
+									<span><i class="ti ti-list"></i></span>
+									<span class="hide-menu">Siparişler</span>
+								</a>
+							</li>
+
+							<li class="sidebar-item">
+								<a class="sidebar-link" href="@Url.Action("UserList","Admin")" aria-expanded="false">
+									<span><i class="ti ti-user"></i></span>
+									<span class="hide-menu">Kullanıcılar</span>
+								</a>
+							</li>
+						}
+
+						<li class="nav-small-cap">
+							<i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+							<span class="hide-menu">ÜRÜN İŞLEMLERİ</span>
+						</li>
+						@if (User.IsInRole("Admin"))
+						{
+							<li class="sidebar-item">
+								<a class="sidebar-link" href="@Url.Action("Create", "Product")" aria-expanded="false">
+									<span><i class="ti ti-circle-plus"></i></span>
+									<span class="hide-menu">Ürün Ekle</span>
+								</a>
+							</li>
+						}
+
+						<li class="sidebar-item">
+							<a class="sidebar-link" href="@Url.Action("Index", "Product")" aria-expanded="false">
+								<span><i class="ti ti-list"></i></span>
+								<span class="hide-menu">Ürün Listesi</span>
+							</a>
+						</li>
+						<li class="sidebar-item">
+							<a class="sidebar-link" href="@Url.Action("RequestProduct", "ProductRequest")" aria-expanded="false">
+								<span><i class="ti ti-binary-tree"></i></span>
+								<span class="hide-menu">Ürün İstek Oluştur</span>
+							</a>
+						</li>
+						@if (User.IsInRole("Admin"))
+						{
+							<li class="sidebar-item">
+								<a class="sidebar-link" href="@Url.Action("ReviewRequests", "AdminProductApproval")" aria-expanded="false">
+									<span><i class="ti ti-history"></i></span>
+									<span class="hide-menu">Ürün İstekleri</span>
+								</a>
+							</li>
+						}
+						<li class="nav-small-cap">
+							<i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+							<span class="hide-menu">STOK İŞLEMLERİ</span>
+						</li>
+						<li class="sidebar-item">
+							<a class="sidebar-link" href="@Url.Action("BarcodeStockEntry", "Stock")" aria-expanded="false">
+								<span><i class="ti ti-circle-plus"></i></span>
+								<span class="hide-menu">Barkod Stok Giriş</span>
+							</a>
+						</li>
+						<li class="sidebar-item">
+							<a class="sidebar-link" href="@Url.Action("BarcodeStockExit", "Stock")" aria-expanded="false">
+								<span><i class="ti ti-outbound"></i></span>
+								<span class="hide-menu">Barkod Stok Çıkış</span>
+							</a>
+						</li>
+						<li class="sidebar-item">
+							<a class="sidebar-link" href="@Url.Action("Create", "Stock")" aria-expanded="false">
+								<span><i class="ti ti-brand-unsplash"></i></span>
+								<span class="hide-menu">Stok Ekle</span>
+							</a>
+						</li>
+						<li class="sidebar-item">
+							<a class="sidebar-link" href="@Url.Action("Index", "Stock")" aria-expanded="false">
+								<span><i class="ti ti-list-check"></i></span>
+								<span class="hide-menu">Stok Listesi</span>
+							</a>
+						</li>
+						<li class="sidebar-item">
+							<a class="sidebar-link" href="@Url.Action("SelectStock", "Stock")" aria-expanded="false">
+								<span><i class="ti ti-edit"></i></span>
+								<span class="hide-menu">Stok Düzenle</span>
+							</a>
+						</li>
+
+						<li class="nav-small-cap">
+							<i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+							<span class="hide-menu">İSTATİSTİK</span>
+						</li>
+						<li class="sidebar-item">
+							<a class="sidebar-link" href="@Url.Action("MonthlyStatisticsEntry", "Statistics")" aria-expanded="false">
+								<span><i class="ti ti-chart-arrows-vertical"></i></span>
+								<span class="hide-menu">İstatistik Gir</span>
+							</a>
+						</li>
+						<li class="sidebar-item">
+							<a class="sidebar-link" href="@Url.Action("ManageTestTemplates", "Statistics")" aria-expanded="false">
+								<span><i class="ti ti-chart-arrows-vertical"></i></span>
+								<span class="hide-menu">İstatistik Test Yönetim</span>
+							</a>
+						</li>
+						<li class="sidebar-item">
+							<a class="sidebar-link" href="@Url.Action("ViewHospitalStatistics", "Statistics")" aria-expanded="false">
+								<span><i class="ti ti-checkup-list"></i></span>
+								<span class="hide-menu">Hastane İstatistikleri</span>
+							</a>
+						</li>
+						@if (User.IsInRole("Admin"))
+						{
+							<li class="sidebar-item">
+								<a class="sidebar-link" href="@Url.Action("ViewAllStatistics", "Statistics")" aria-expanded="false">
+									<span><i class="ti ti-list-numbers"></i></span>
+									<span class="hide-menu">Tüm İstatistik Listesi</span>
+								</a>
+							</li>
+							<li class="sidebar-item">
+								<a class="sidebar-link" href="@Url.Action("FilterStatistics", "Statistics")" aria-expanded="false">
+									<span><i class="ti ti-sort-descending-2"></i></span>
+									<span class="hide-menu">İstatistik Filtrele</span>
+								</a>
+							</li>
+						}
+						<li class="nav-small-cap">
+							<i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+							<span class="hide-menu">İLETİŞİM</span>
+						</li>
+						<li class="sidebar-item">
+							<a class="sidebar-link" href="@Url.Action("Create", "Message")" aria-expanded="false">
+								<span><i class="ti ti-messages"></i></span>
+								<span class="hide-menu">Mesaj Gönder</span>
+							</a>
+						</li>
+						@if (User.IsInRole("Admin"))
+						{
+							<li class="sidebar-item">
+								<a class="sidebar-link" href="@Url.Action("AdminMessageIndex", "Message")" aria-expanded="false">
+									<span><i class="ti ti-message"></i></span>
+									<span class="hide-menu">Mesajlar</span>
+								</a>
+							</li>
+						}
+						@if (User.IsInRole("Admin"))
+						{
+							<li class="nav-small-cap">
+								<i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+								<span class="hide-menu">Sistem</span>
+							</li>
+							<li class="sidebar-item">
+								<a class="sidebar-link" href="@Url.Action("Index", "Backup")" aria-expanded="false">
+									<span><i class="ti ti-database-export"></i></span>
+									<span class="hide-menu">Veritabanı Yedekle</span>
+								</a>
+							</li>
+							<li class="sidebar-item">
+								<a class="sidebar-link" href="@Url.Action("Index", "ErrorLog")" aria-expanded="false">
+									<span><i class="ti ti-section"></i></span>
+									<span class="hide-menu">Hata Logları</span>
+								</a>
+							</li>
+						}
+
+					</ul>
+				</nav>
+			</div>
+		</aside>
+
+		<div class="body-wrapper sidebar-collapsed">
+			<!-- Header -->
+			<header class="app-header">
+				<nav class="navbar navbar-expand-lg navbar-light bg-light">
+					<div class="container-fluid">
+						<!-- Sağ üst köşede kullanıcı bilgisi -->
+						<div class="d-flex align-items-center ms-auto">
+							@if (User.Identity.IsAuthenticated)
+							{
+								@await Html.PartialAsync("_UserHospitalInfo")
+							}
+							else
+							{
+								<a href="@Url.Action("Login", "Account")" class="btn btn-outline-primary">
+									<i class="ti ti-login"></i> Giriş Yap
+								</a>
+							}
+						</div>
+					</div>
+				</nav>
+			</header>
+
+			<!-- Ana İçerik -->
+			<div class="container-fluid">
+				@RenderBody()
+			</div>
+		</div>
+		<!-- Sidebar End -->
+	</div>
+
+	<!-- Scripts -->
+	<script src="~/Modernize-1.0.0/src/assets/libs/jquery/dist/jquery.min.js"></script>
+	<script src="~/Modernize-1.0.0/src/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="~/Modernize-1.0.0/src/assets/js/sidebarmenu.js"></script>
+	<script src="~/Modernize-1.0.0/src/assets/js/app.min.js"></script>
+	<script src="~/Modernize-1.0.0/src/assets/libs/apexcharts/dist/apexcharts.min.js"></script>
+	<script src="~/Modernize-1.0.0/src/assets/libs/simplebar/dist/simplebar.js"></script>
+	<script src="~/Modernize-1.0.0/src/assets/js/dashboard.js"></script>
+	@RenderSection("Scripts", required: false)
+</body>
+</html>

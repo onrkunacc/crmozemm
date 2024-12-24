@@ -1,0 +1,44 @@
+﻿@model IEnumerable<HospitalInventoryManagement.Data.DTOs.StatisticsDTO>
+
+@{
+    ViewData["Title"] = "Hastane İstatistikleri";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>@ViewBag.HospitalName Hastanesi İstatistikleri</h1>
+
+<form method="get" asp-action="ViewHospitalStatistics">
+    <input type="hidden" name="hospitalId" value="@ViewBag.HospitalID" />
+
+    <label for="selectedMonth">Ay Seçin:</label>
+    <input type="month" id="selectedMonth" name="selectedMonth" value="@ViewBag.SelectedMonth?.ToString("yyyy-MM")" class="form-control" />
+
+    <button type="submit" class="btn btn-primary mt-2">Filtrele</button>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Hastane Adı</th>
+            <th>Test Adı</th>
+            <th>Ay</th>
+            <th>Test Sayısı</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var stat in Model)
+        {
+            <tr>
+                <td>@stat.HospitalName</td>
+                <td>@stat.TestName</td>
+                <td>@stat.Month.ToString("MMMM yyyy", new System.Globalization.CultureInfo("tr-TR"))</td>
+                <td>@stat.TestCount</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<p>
+    <a asp-action="ExportToPdf" asp-route-hospitalId="@ViewBag.HospitalID" class="btn btn-danger m-1">PDF Olarak Kaydet</a>
+    <a asp-action="ExportToExcel" asp-route-hospitalId="@ViewBag.HospitalID" class="btn btn-success m-1">Excel Olarak Kaydet</a>
+</p>

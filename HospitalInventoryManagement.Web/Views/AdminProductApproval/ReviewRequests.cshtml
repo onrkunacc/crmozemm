@@ -1,0 +1,54 @@
+﻿@model IEnumerable<HospitalInventoryManagement.Web.ViewModel.ProductRequestViewModel>
+@{
+    ViewData["Title"] = "Ürün İstekleri";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Ürün İstekleri</h1>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Ürün Adı</th>
+            <th>Referans Numarası</th>
+            <th>Gönderen Kullanıcı</th>
+            <th>Gönderen Hastane</th>
+            <th>İstek Tarihi</th>
+            <th>Durum</th>
+            <th>İşlemler</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var request in Model)
+        {
+            <tr>
+                <td>@request.ProductName</td>
+                <td>@request.ReferenceNumber</td>
+                <td>@request.RequestedByUserName</td>
+                <td>@request.RequestedByHospitalName</td>
+                <td>@request.RequestDate.ToString("dd-MM-yyyy HH:mm")</td>
+                <td>@request.Status</td>
+                <td>
+                    <form asp-action="ApproveRequest" method="post" style="display:inline;">
+                        <input type="hidden" name="id" value="@request.ProductRequestID" />
+                        <button type="submit" class="btn btn-success btn-sm">Onayla</button>
+                    </form>
+                    <form asp-action="RejectRequest" method="post" style="display:inline;">
+                        <input type="hidden" name="id" value="@request.ProductRequestID" />
+                        <button type="submit" class="btn btn-danger btn-sm">Reddet</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

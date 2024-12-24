@@ -1,0 +1,99 @@
+﻿@model IEnumerable<HospitalInventoryManagement.Data.Models.Stock>
+
+@{
+    ViewData["Title"] = "Stok Listesi";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<head>
+    <style>
+        form {
+            margin-bottom: 20px;
+        }
+
+        input.form-control {
+            max-width: 400px;
+            display: inline-block;
+        }
+
+        table {
+            margin-top: 20px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 5px;
+        }
+
+            .btn-group .btn {
+                flex: 1;
+                text-align: center;
+            }
+    </style>
+</head>
+
+<body>
+    <h1>Stok Listesi</h1>
+    <form method="get" asp-action="Index" class="mb-3">
+        <div class="row">
+            <div class="col-md-6">
+                <input type="text" name="searchQuery" value="@ViewBag.SearchQuery" class="form-control" placeholder="Ürün adı ile arayın">
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary">Ara</button>
+            </div>
+        </div>
+    </form>
+    @if (!Model.Any())
+    {
+        <p class="text-danger">Arama kriterlerinize uygun stok bulunamadı.</p>
+    }
+    <p>
+        <a asp-action="Create" class="btn btn-primary m-1">Yeni Stok Girişi</a>
+    </p>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Ürün Adı</th>
+                <th>Kategori</th>
+                <th>Ürün Tipi</th>
+                <th>Platform</th>
+                <th>Referans Numarası</th>
+                <th>Lot Numarası</th>
+                <th>Hastane Adı</th>
+                <th>Adet</th>
+                <th>Flakon Sayısı</th> <!-- Flakon sayısını ekledik -->
+                <th>Miadı</th>
+                <th>Son Güncelleme</th>
+                <th>İşlemler</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Product?.ProductName</td>
+                    <td>@item.Product?.Category?.CategoryName</td>
+                    <td>@item.Product?.ProductType?.TypeName</td>
+                    <td>@item.Product?.Platform?.PlatformName</td>
+                    <td>@item.Product?.ReferenceNumber</td>
+                    <td>@item.LotNumber</td>
+                    <td>@item.Hospital?.HospitalName</td>
+                    <td>@item.Quantity</td>
+                    <td>@item.FlaconCount</td> <!-- Stok içindeki flakon sayısını göster -->
+                    <td>@item.ExpiryDate.ToString("dd-MM-yyyy")</td>
+                    <td>@item.LastUpdated.ToString("dd-MM-yyyy HH:mm")</td>
+                    <td>
+                        <div class="btn-group">
+                            <a asp-action="ManageFlacon" asp-route-id="@item.StockID" class="btn btn-sm btn-primary">Flakon Giriş-Çıkış</a>
+                            <a asp-action="Edit" asp-route-id="@item.StockID" class="btn btn-sm btn-warning">Stok Düzenle</a>
+                            <a asp-action="Delete" asp-route-id="@item.StockID" class="btn btn-sm btn-danger">Sil</a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</body>

@@ -1,0 +1,58 @@
+﻿@model IEnumerable<HospitalInventoryManagement.Data.DTOs.StatisticsDTO>
+
+@{
+    ViewData["Title"] = "Tüm Hastane İstatistikleri";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Aylık Tüm Hastanelerin İstatistikleri</h1>
+
+<form method="get" asp-action="ViewAllStatistics">
+    <div class="row mb-3">
+        <!-- Hastane Seçimi -->
+        <div class="col-md-4">
+            <label for="hospitalId" class="form-label">Hastane Seçin:</label>
+            <select id="hospitalId" name="hospitalId" class="form-select" asp-items="ViewBag.Hospitals" onchange="this.form.submit()" class="form-control">
+                <option value="">Tüm Hastaneler</option>
+            </select>
+        </div>
+
+        <!-- Sıralama Butonları -->
+        <div class="col-md-4">
+            <label class="form-label">Sıralama:</label>
+            <div class="btn-group">
+                <a asp-action="ViewAllStatistics" asp-route-hospitalId="@ViewBag.SelectedHospitalID" asp-route-sortOrder="NameAsc" class="btn btn-outline-dark">Ürün Adı ↑</a>
+                <a asp-action="ViewAllStatistics" asp-route-hospitalId="@ViewBag.SelectedHospitalID" asp-route-sortOrder="NameDesc" class="btn btn-outline-dark">Ürün Adı ↓</a>
+                <a asp-action="ViewAllStatistics" asp-route-hospitalId="@ViewBag.SelectedHospitalID" asp-route-sortOrder="DateAsc" class="btn btn-outline-dark">Tarih ↑</a>
+                <a asp-action="ViewAllStatistics" asp-route-hospitalId="@ViewBag.SelectedHospitalID" asp-route-sortOrder="DateDesc" class="btn btn-outline-dark">Tarih ↓</a>
+            </div>
+        </div>
+    </div>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Hastane Adı</th>
+            <th>Ay</th>
+            <th>Test Adı</th>
+            <th>Test Sayısı</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var stat in Model)
+        {
+            <tr>
+                <td>@stat.HospitalName</td>
+                <td>@stat.Month.ToString("MMMM yyyy")</td>
+                <td>@stat.TestName</td>
+                <td>@stat.TestCount</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<p>
+    <a asp-action="ExportToPdf" asp-route-hospitalId="@ViewBag.SelectedHospitalID" class="btn btn-danger">PDF Olarak Kaydet</a>
+    <a asp-action="ExportToExcel" asp-route-hospitalId="@ViewBag.SelectedHospitalID" class="btn btn-success">Excel Olarak Kaydet</a>
+</p>

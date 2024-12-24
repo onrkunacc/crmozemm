@@ -1,0 +1,42 @@
+﻿@model HospitalInventoryManagement.Web.ViewModel.StockViewModel
+
+@{
+    ViewData["Title"] = "Stok Düzenle";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <h1 class="card-title fw-semibold mb-4">Stok Düzenleme</h1>
+                <div class="card">
+                    <div class="card-body">
+                        <form asp-action="Edit" method="post">
+                            <input type="hidden" asp-for="StockID"/>
+                            <div class="mb-3">
+                                <label asp-for="ProductID" class="form-label">Ürün Adı :</label>
+                                <select asp-for="ProductID" asp-items="Model.Products" class="form-control"></select>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="HospitalID" class="form-label">Hastane :</label>
+                                <select asp-for="HospitalID" asp-items="Model.Hospitals" class="form-control"></select>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="Quantity" class="form-label">Adet :</label>
+                                <input asp-for="Quantity" class="form-control" />
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="ExpirationDate" class="form-label">Miadı :</label>
+                                <input asp-for="ExpirationDate" type="date" class="form-control" />
+                            </div>
+                            <button type="submit" class="btn btn-primary m-1">Kaydet</button>
+                            <a asp-action="Index" class="btn btn-secondary m-1">İptal</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,25 @@
+﻿@model HospitalInventoryManagement.Data.Models.Stock
+
+@{
+    ViewData["Title"] = "Stok Sil";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Stok Kaldırma</h1>
+
+<div class="alert alert-danger">
+    <h4>Bu ürünü stoktan kaldırmak istiyor musunuz ?</h4>
+</div>
+
+<div>
+    <p><strong>Ürün Adı :</strong> @Model.Product?.ProductName</p>
+    <p><strong>Hastane Adı:</strong> @Model.Hospital?.HospitalName</p>
+    <p><strong>Adet :</strong> @Model.Quantity</p>
+    <p><strong>Miadı :</strong> @Model.ExpiryDate.ToString("yyyy-MM-dd")</p>
+</div>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="StockID" />
+    <button type="submit" class="btn btn-danger">Sil</button>
+    <a asp-action="Index" class="btn btn-secondary">Vazgeç</a>
+</form>

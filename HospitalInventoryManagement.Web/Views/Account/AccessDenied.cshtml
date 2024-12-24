@@ -1,0 +1,68 @@
+﻿@{
+    ViewData["Title"] = "Erişim Reddedildi";
+    Layout = null;
+}
+<head>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif; /* Modern ve zarif yazı tipi */
+            background-color: #f4f7f6; /* Daha yumuşak bir arka plan rengi */
+            margin: 0;
+            height: 100vh; /* Yüksekliği tam ekran yapar */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px; /* Yumuşatılmış köşeler */
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Daha belirgin ama yumuşak bir gölge */
+            background-color: #ffffff; /* Kartın arka plan rengi */
+            padding: 30px;
+            max-width: 450px;
+        }
+
+        .card-body h1 {
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: #e74c3c; /* Hafifçe parlak kırmızı renk */
+            margin-bottom: 15px;
+        }
+
+        .card-body p {
+            font-size: 1rem;
+            color: #34495e; /* Koyu ama yumuşak metin rengi */
+            line-height: 1.6;
+        }
+
+        .btn-primary {
+            background-color: #3498db;
+            border: none;
+            font-size: 1rem;
+            padding: 12px 25px;
+            border-radius: 30px; /* Yumuşak buton köşeleri */
+            font-weight: 500;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1); /* Buton gölgesi */
+            transition: all 0.3s ease-in-out;
+        }
+
+            .btn-primary:hover {
+                background-color: #2980b9;
+                box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+                transform: translateY(-2px); /* Hafif hover animasyonu */
+            }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="card-body text-center">
+            <h1 class="display-4">🚫 Erişim Reddedildi!</h1>
+            <p>
+                Üzgünüz, bu sayfaya erişim izniniz bulunmamaktadır.<br>
+                Lütfen farklı bir sayfa deneyin veya ana sayfaya geri dönün.
+            </p>
+            <a href="~/Home/Index" class="btn btn-primary mt-3">Ana Sayfaya Dön</a>
+        </div>
+    </div>
+</body>

@@ -1,0 +1,63 @@
+﻿@model HospitalInventoryManagement.Web.ViewModel.StockTransactionViewModel
+
+@{
+    ViewData["Title"] = "CreateTransaction";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        <ul>
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <li>@error.ErrorMessage</li>
+            }
+        </ul>
+    </div>
+}
+
+<div class="container-fluid">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <h1 class="card-title fw-semibold mb-4">Stok Giriş-Çıkış İşlemleri</h1>
+                <div class="card">
+                    <div class="card-body">
+                        <form asp-action="CreateTransaction" method="post">
+                            @if (ViewBag.Stocks != null)
+                            {
+                                <div class="mb-3">
+                                    <label asp-for="StockID" class="form-label">Stok Ürün :</label>
+                                    <select asp-for="StockID" asp-items="Model.Stocks" class="form-control"></select>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="alert alert-warning">Mevcut bir stok bulunamadı. Lütfen önce stok ekleyin.</div>
+                            }
+                            <div class="mb-3">
+                                <label asp-for="TransactionType" class="form-label">İşlem Türü :</label>
+                                <select asp-for="TransactionType" class="form-control">
+                                    <option value="Giriş">Stok Giriş</option>
+                                    <option value="Çıkış">Stok Çıkış</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="ChangeQuantity" class="form-label">Adet :</label>
+                                <input asp-for="ChangeQuantity" class="form-control" />
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="Description" class="form-label">Açıklama</label>
+                                <input asp-for="Description" class="form-control" />
+                            </div>
+                            <button type="submit" class="btn btn-primary m-1">Kaydet</button>
+                            <a asp-action="Index" class="btn btn-secondary m-1">İptal</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

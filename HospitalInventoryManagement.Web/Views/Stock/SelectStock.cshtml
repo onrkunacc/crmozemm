@@ -1,0 +1,27 @@
+﻿@model int
+@{
+    ViewData["Title"] = "Stoktaki Ürünü Seç";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <h1 class="card-title fw-semibold mb-4">Düzenlemek için Stoktaki Ürünü Seç</h1>
+                <div class="card">
+                    <div class="card-body">
+                        <form asp-action="SelectStock" method="post">
+                            <div class="mb-3">
+                                <label for="stockId" class="form-label">Stok Ürünü :</label>
+                                <select name="stockId" class="form-control" asp-items="ViewBag.Stocks"></select>
+                            </div>
+                            <button type="submit" class="btn btn-primary m-1">Düzenle</button>
+                            <a asp-action="Index" class="btn btn-secondary m-1">İptal</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

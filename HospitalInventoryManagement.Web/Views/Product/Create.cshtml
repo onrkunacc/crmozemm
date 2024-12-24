@@ -1,0 +1,73 @@
+﻿@model HospitalInventoryManagement.Web.ViewModel.ProductCreateViewModel
+
+@{
+    ViewData["Title"] = "Yeni Ürün Girişi";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<div class="container-fluid">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title fw-semibold mb-4">Yeni Ürün Girişi</h4>
+                <div class="card">
+                    <div class="card-body">
+                        <form asp-action="Create" method="post">
+                            <div class="mb-3">
+                                <label asp-for="ProductName" class="form-label">Ürün Adı :</label>
+                                <input class="form-control" asp-for="ProductName">
+                                <span asp-validation-for="ProductName" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="ReferenceNumber" class="form-label">Referans Numarası :</label>
+                                <input class="form-control" asp-for="ReferenceNumber">
+                                <span asp-validation-for="ReferenceNumber" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="LotNumber" class="form-label">Lot Numarası :</label>
+                                <input class="form-control" asp-for="LotNumber">
+                                <span asp-validation-for="LotNumber" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="BoxTextCount" class="form-label">Kutu Test Adedi :</label>
+                                <input class="form-control" asp-for="BoxTextCount">
+                                <span asp-validation-for="BoxTextCount" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="CategoryID" class="form-label">Kategori :</label>
+                                <select asp-for="CategoryID" asp-items="ViewBag.Categories" class="form-control" required></select>
+                                <span asp-validation-for="CategoryID" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="TypeID" class="form-label">Ürün Tipi :</label>
+                                <select asp-for="TypeID" asp-items="ViewBag.ProductTypes" class="form-control" required></select>
+                                <span asp-validation-for="TypeID" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="PlatformID" class="form-label">Platform :</label>
+                                <select asp-for="PlatformID" asp-items="ViewBag.Platforms" class="form-control" required></select>
+                                <span asp-validation-for="PlatformID" class="text-danger"></span>
+                            </div>
+                            <button type="submit" class="btn btn-primary m-1">Kaydet</button>
+                            <a asp-action="Index" class="btn btn-secondary m-1">İptal</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

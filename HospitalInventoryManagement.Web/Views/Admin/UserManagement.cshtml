@@ -1,0 +1,33 @@
+﻿@model IEnumerable<HospitalInventoryManagement.Web.ViewModel.UserWithRolesViewModel>
+
+@{
+    ViewData["Title"] = "Kullanıcı Yönetimi";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Kullanıcı Yönetimi</h2>
+
+<table class="table">
+    <tr>
+        <th>Email</th>
+        <th>Roller</th>
+        <th>İşlemler</th>
+    </tr>
+    @foreach (var user in Model)
+    {
+        <tr>
+            <td>@user.Email</td>
+            <td>@string.Join(", ", user.Roles)</td>
+            <td>
+                <form asp-action="AssignRole" method="post">
+                    <input type="hidden" name="userId" value="@user.UserId" />
+                    <select name="roleName" class="form-select">
+                        <option value="User">User</option>
+                        <option value="Admin">Admin</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary">Rol Ata</button>
+                </form>
+            </td>
+        </tr>
+    }
+</table>

@@ -1,0 +1,25 @@
+﻿@model HospitalInventoryManagement.Data.Models.Product
+
+@{
+    ViewData["Title"] = "Ürün Detay";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>@Model.ProductName Detay</h1>
+
+<div class="card">
+    <div class="card-body">
+        <h3>@Model.ProductName</h3>
+        <p><strong>Referans Numarası :</strong> @Model.ReferenceNumber</p>
+        <p><strong>Lot Numarası :</strong> @Model.LotNumber</p>
+        <p><strong>Kutu Test Adedi :</strong> @Model.BoxTextCount</p>
+        <p><strong>Kategori :</strong> @Model.Category?.CategoryName</p>
+        <p><strong>Ürün Tipi :</strong> @Model.ProductType?.TypeName</p>
+        <p><strong>Platform :</strong> @Model.Platform?.PlatformName</p>
+
+        <a asp-action="Edit" asp-route-id="@Model.ProductID" class="btn btn-primary m-1">Düzenle</a>
+        <form asp-action="Delete" asp-route-id="@Model.ProductID" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-danger m-1">Sil</button>
+        </form>
+    </div>
+</div>

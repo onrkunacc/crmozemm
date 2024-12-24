@@ -1,0 +1,41 @@
+﻿@model HospitalInventoryManagement.Web.ViewModel.ProductRequestViewModel
+@{
+    ViewData["Title"] = "Ürün Ekleme İsteği";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <h1>Ürün Ekleme İsteği</h1>
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <form asp-action="RequestProduct" method="post">
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <div class="form-group">
+            <label asp-for="ProductName"></label>
+            <input asp-for="ProductName" class="form-control" />
+            <span asp-validation-for="ProductName" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="ReferenceNumber"></label>
+            <input asp-for="ReferenceNumber" class="form-control" />
+            <span asp-validation-for="ReferenceNumber" class="text-danger"></span>
+        </div>
+
+        <!-- Hidden inputlar -->
+        <input type="hidden" asp-for="RequestedByUserID" />
+        <input type="hidden" asp-for="RequestedByUserName" />
+        <input type="hidden" asp-for="RequestedByHospitalName" />
+
+        <button type="submit" class="btn btn-primary mt-3">Gönder</button>
+    </form>
+</div>
+
+

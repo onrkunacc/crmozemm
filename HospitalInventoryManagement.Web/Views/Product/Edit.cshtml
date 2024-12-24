@@ -1,0 +1,56 @@
+﻿@model HospitalInventoryManagement.Web.ViewModel.ProductEditViewModel
+
+@{
+    ViewData["Title"] = "Düzenle";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="container-fluid">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <h2>Ürün Düzenle</h2>
+                <h4 class="card-title fw-semibold mb-4">@Model.ProductName</h4>
+                <div class="card">
+                    <div class="card-body">
+                        <form asp-action="Edit" method="post">
+                            <input type="hidden" asp-for="ProductID"/>
+                            <div class="mb-3">
+                                <label asp-for="ProductName" class="form-label">Ürün Adı :</label>
+                                <input class="form-control" asp-for="ProductName">
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="ReferenceNumber" class="form-label">Referans Numarası :</label>
+                                <input class="form-control" asp-for="ReferenceNumber">
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="LotNumber" class="form-label">Lot Numarası :</label>
+                                <input class="form-control" asp-for="LotNumber">
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="BoxTextCount" class="form-label">Kutu Test Adedi :</label>
+                                <input class="form-control" asp-for="BoxTextCount">
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="CategoryID" class="form-label">Kategori :</label>
+                                <select asp-for="CategoryID" asp-items="Model.Categories" class="form-control"></select>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="TypeID" class="form-label">Ürün Tipi :</label>
+                                <select asp-for="TypeID" asp-items="Model.ProductTypes" class="form-control"></select>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="PlatformID" class="form-label">Platform :</label>
+                                <select asp-for="PlatformID" asp-items="Model.Platforms" class="form-control"></select>
+                            </div>
+                            <button type="submit" class="btn btn-primary m-1">Kaydet</button>
+                            <a asp-action="Index" class="btn btn-secondary m-1">İptal</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

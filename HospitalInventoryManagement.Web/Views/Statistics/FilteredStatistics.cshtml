@@ -1,0 +1,33 @@
+﻿@model IEnumerable<HospitalInventoryManagement.Web.ViewModel.MonthlyStatisticsSummaryViewModel>
+
+@{
+    ViewData["Title"] = "İstatistikler";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>@ViewBag.StartMonth - @ViewBag.EndMonth Tarihler Arasındaki Filtrelenmiş İstatistikler</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Test Adı</th>
+            <th>Aylık Test Sayıları</th>
+            <th>Ortalama Test Sayısı</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var summary in Model)
+        {
+            <tr>
+                <td>@summary.TestName</td>
+                <td>
+                    @foreach (var monthlyTest in summary.MonthlyTestCounts)
+                    {
+                        <div>@monthlyTest.Month: @monthlyTest.TestCount</div>
+                    }
+                </td>
+                <td>@summary.AverageTestCount</td>
+            </tr>
+        }
+    </tbody>
+</table>
