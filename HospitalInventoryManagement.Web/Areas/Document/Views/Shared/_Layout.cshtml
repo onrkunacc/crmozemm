@@ -1,0 +1,29 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@ViewData["Title"] - Document Area</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <div class="page-wrapper">
+        <header class="app-header">
+            <nav>
+                <ul>
+                    <li><a href="@Url.Action("Index", "Document", new { area = "Document" })">Evrak Takip</a></li>
+                    <li><a href="@Url.Action("AddDocument", "Document", new { area = "Document" })">Evrak Ekle</a></li>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <li><a href="@Url.Action("Index", "Home", new { area = "" })">Admin Paneline Dön</a></li>
+                    }
+                </ul>
+            </nav>
+        </header>
+
+        <div class="container">
+            @RenderBody()
+        </div>
+    </div>
+</body>
+</html>

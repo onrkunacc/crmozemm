@@ -59,6 +59,12 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.User.RequireUniqueEmail = true; // Kullanıcı oturumunun doğrulama ayarları
 });
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("DocumentAccess", policy =>
+        policy.RequireRole("DocumentRole", "Admin"));
+});
+
 var app = builder.Build();
 
 // Rolleri seed eden bir fonksiyon eklemek
