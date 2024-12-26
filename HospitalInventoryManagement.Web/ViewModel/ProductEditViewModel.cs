@@ -10,7 +10,7 @@ namespace HospitalInventoryManagement.Web.ViewModel
         public string ReferenceNumber { get; set; }
         public string LotNumber { get; set; }
         public int BoxTextCount { get; set; }
-
+        public int FlaconCountPerBox { get; set; }
         public int CategoryID { get; set; }
         public int TypeID { get; set; }
         public int PlatformID { get; set; }

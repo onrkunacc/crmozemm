@@ -5,6 +5,7 @@ using HospitalInventoryManagement.Web.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace HospitalInventoryManagement.Web.Controllers
 {
@@ -14,13 +15,12 @@ namespace HospitalInventoryManagement.Web.Controllers
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationDbContext _context;
-        private readonly IApiService _apiService;
 
-        public AdminController(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager, IApiService apiService, ApplicationDbContext context)
+        public AdminController(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager, ApplicationDbContext context)
         {
             _roleManager = roleManager;
             _userManager = userManager;
-            _apiService = apiService;
+
             _context = context;
         }
 
@@ -74,16 +74,35 @@ namespace HospitalInventoryManagement.Web.Controllers
             return RedirectToAction("UserManagement");
         }
 
-        public async Task<ActionResult> Index(int page = 1)
+        [HttpGet]
+        public async Task<JsonResult> GetHospitalStocks(int? hospitalId)
         {
-            await _apiService.LoginAsync("admin", "123ozem");
+            // Eğer hospitalId null ise tüm hastaneleri al
+            var query = _context.Stocks.AsQueryable();
 
-            // Tablo ve sayfa numaralarını çek
-            var (tableHtml, pageNumbers) = await _apiService.FetchHtmlTableWithPagesAsync(page);
+            if (hospitalId.HasValue)
+            {
+                query = query.Where(s => s.HospitalID == hospitalId.Value);
+            }
 
-            // View'e verileri gönder
-            ViewBag.HtmlTable = tableHtml;
-            ViewBag.PageNumbers = pageNumbers;
+            // Gruplandırılmış veriyi çek
+            var stockData = await query
+                .GroupBy(s => s.Hospital.HospitalName)
+                .Select(g => new
+                {
+                    HospitalName = g.Key,
+                    TotalStock = g.Sum(s => s.Quantity) // Toplam stok miktarı
+                })
+                .ToListAsync();
+
+            return Json(stockData);
+        }
+        public async Task<ActionResult> Index()
+        {
+            // Hastane listesini ViewBag'e aktar
+            ViewBag.Hospitals = _context.Hospitals
+                .Select(h => new { h.HospitalID, h.HospitalName })
+                .ToList();
 
             return View();
         }

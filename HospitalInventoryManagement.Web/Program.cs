@@ -1,25 +1,26 @@
-using HospitalInventoryManagement.BL.Extensions;
+ï»¿using HospitalInventoryManagement.BL.Extensions;
 using HospitalInventoryManagement.BL.Interfaces;
 using HospitalInventoryManagement.BL.Service;
 using HospitalInventoryManagement.Data.Context;
 using HospitalInventoryManagement.Data.Models;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Veritabaný baðlantý dizgesini al
+// VeritabanÄ± baÄŸlantÄ± dizgesini al
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-// DbContext ayarý
+// DbContext ayarÄ±
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
-// Identity ayarlarý
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>()  // Rollerle birlikte kimlik doðrulama
+// Identity ayarlarÄ±
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()  // Rollerle birlikte kimlik doÄŸrulama
     .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultTokenProviders();  // Þifre sýfýrlama ve e-posta doðrulama gibi iþlemler için token saðlayýcý
+    .AddDefaultTokenProviders();  // Åžifre sÄ±fÄ±rlama ve e-posta doÄŸrulama gibi iÅŸlemler iÃ§in token saÄŸlayÄ±cÄ±
 
 // Service ve Interface eklemeleri
 builder.Services.AddScoped<IProductService, ProductService>();
@@ -27,23 +28,23 @@ builder.Services.AddScoped<IStockService, StockService>();
 builder.Services.AddScoped<IStatisticsService, StatisticsService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IBarcodeService, BarcodeService>();
-builder.Services.AddScoped<IApiService, ApiService>();  
 builder.Services.AddScoped<IErrorLogService, ErrorLogService>();
 
-builder.Services.ConfigureApplicationCookie(options =>
-{
-    options.Cookie.Name = "HospitalInventory";
-    options.ExpireTimeSpan = TimeSpan.FromMinutes(30); // Çerez süresi, isteðe baðlý
-    options.SlidingExpiration = false; // Çerez süresi dolunca otomatik oturum kapatma
-    options.Cookie.HttpOnly = true;
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.Cookie.Name = "auth-cookie";
+        options.Cookie.HttpOnly = true;
+        options.Cookie.IsEssential = true;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // HTTPS zorunlu
+        options.Cookie.SameSite = SameSiteMode.Lax; // Ã‡apraz site cookie kullanÃ½mÃ½
+        options.LoginPath = "/Account/Login"; // GiriÃ¾ sayfasÃ½
+        options.AccessDeniedPath = "/Account/AccessDenied"; // Yetkisiz eriÃ¾im
+        options.ExpireTimeSpan = TimeSpan.FromDays(7); // Cookie sÃ¼resi
+        options.SlidingExpiration = true; // KullanÃ½cÃ½ aktifken sÃ¼reyi uzat
+    });
 
-
-    options.LoginPath = "/Account/Login"; // Giriþ sayfasý yolu
-    options.LogoutPath = "/Account/Logout"; // Çýkýþ sayfasý yolu
-    options.AccessDeniedPath = "/Account/AccessDenied"; // Eriþim engellendiðinde yönlendirilecek sayfa
-});
-
-// MVC ve Razor Pages desteði
+// MVC ve Razor Pages desteÄŸi
 builder.Services.AddControllersWithViews();
 
 builder.Services.Configure<IdentityOptions>(options =>
@@ -54,17 +55,14 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.Password.RequireUppercase = false;
     options.Password.RequireLowercase = false;
     options.Password.RequiredUniqueChars = 1;
+
+    options.User.RequireUniqueEmail = true; // KullanÄ±cÄ± oturumunun doÄŸrulama ayarlarÄ±
 });
 
 var app = builder.Build();
 
 // Rolleri seed eden bir fonksiyon eklemek
-using (var scope = app.Services.CreateScope())
-{
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-    await SeedRolesAndAdminsAsync(roleManager, userManager);
-}
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -79,65 +77,15 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseMiddleware<ExceptionMiddleware>();
 
-// Kimlik doðrulama ve yetkilendirme middleware'lerini ekle
+// Kimlik doÄŸrulama ve yetkilendirme middleware'lerini ekle
 app.UseAuthentication();
 app.UseAuthorization();
 
-// MVC route ayarý
+// MVC route ayarÄ±
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
 
-// Rolleri ve admin kullanýcýyý seed eden fonksiyon
-async Task SeedRolesAndAdminsAsync(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager)
-{
-    // Rolleri oluþtur
-    var roles = new[] { "Admin", "User" };
-    foreach (var role in roles)
-    {
-        if (!await roleManager.RoleExistsAsync(role))
-        {
-            await roleManager.CreateAsync(new IdentityRole(role));
-        }
-    }
-
-    // Admin kullanýcý listesi
-    var adminUsers = new[]
-    {
-        new { Email = "ozem@ozemmedikal.com", UserName = "ozem", Password = "ozem123" },
-        new { Email = "admin@ozemmedikal.com", UserName = "admin", Password = "admin123" }
-    };
-
-    foreach (var admin in adminUsers)
-    {
-        var adminUser = await userManager.FindByEmailAsync(admin.Email);
-        if (adminUser == null)
-        {
-            adminUser = new ApplicationUser
-            {
-                UserName = admin.UserName,
-                Email = admin.Email,
-                EmailConfirmed = true
-            };
-
-            var createResult = await userManager.CreateAsync(adminUser, admin.Password);
-            if (!createResult.Succeeded)
-            {
-                foreach (var error in createResult.Errors)
-                {
-                    Console.WriteLine($"Hata: {error.Description}");
-                }
-                continue;
-            }
-        }
-
-        // Admin rolünü atama
-        if (!await userManager.IsInRoleAsync(adminUser, "Admin"))
-        {
-            await userManager.AddToRoleAsync(adminUser, "Admin");
-        }
-    }
-}
 

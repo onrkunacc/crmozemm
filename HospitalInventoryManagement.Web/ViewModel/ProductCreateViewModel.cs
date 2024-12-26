@@ -10,8 +10,7 @@ namespace HospitalInventoryManagement.Web.ViewModel
         [Required(ErrorMessage = "Referans numarası zorunludur.")]
         public string ReferenceNumber { get; set; }
 
-        [Required(ErrorMessage = "Lot numarası zorunludur.")]
-        public string LotNumber { get; set; }
+        public int FlaconCountPerBox { get; set; }
 
         [Required(ErrorMessage = "Kutu test adedi zorunludur.")]
         public int BoxTextCount { get; set; }

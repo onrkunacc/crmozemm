@@ -1,35 +1,73 @@
 ﻿@{
-    ViewData["Title"] = "Siparişler";
+    ViewData["Title"] = "Grafik";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Siparişler</h1>
+<div>
+    <label for="hospitalSelect" class="form-label">Hastane Seç:</label>
+    <br />
+    <select id="hospitalSelect" class="form-control">
+        <option value="">Tüm Hastaneler</option>
+        @foreach (var hospital in ViewBag.Hospitals)
+        {
+            <option value="@hospital.HospitalID">@hospital.HospitalName</option>
+        }
+    </select>
+</div>
+<br />
+<br />
+<canvas id="stockChart" width="400" height="200"></canvas>
 
-@if (ViewBag.HtmlTable != null)
-{
-    <div>
-        @Html.Raw(ViewBag.HtmlTable)
-    </div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('stockChart').getContext('2d');
+    let stockChart;
 
-    @if (ViewBag.PageNumbers != null && ViewBag.PageNumbers.Count > 0)
-    {
-        <nav>
-            <ul class="pagination">
-                @foreach (var pageNum in ViewBag.PageNumbers)
-                {
-                    <li class="page-item">
-                        <a class="page-link" href="@Url.Action("Index", "Siparisler", new { page = pageNum })">Sayfa @pageNum</a>
-                    </li>
+    async function fetchStockData(hospitalId) {
+        const response = await fetch(`/Admin/GetHospitalStocks?hospitalId=${hospitalId || ''}`);
+        const data = await response.json();
+        return data;
+    }
+
+    async function updateChart(hospitalId) {
+        const stockData = await fetchStockData(hospitalId);
+
+        const labels = stockData.map(item => item.HospitalName);
+        const dataValues = stockData.map(item => item.TotalStock);
+
+        // Eğer grafik zaten varsa, güncelle
+        if (stockChart) {
+            stockChart.destroy();
+        }
+
+        stockChart = new Chart(ctx, {
+            type: 'bar', // Grafik türü (ör. bar, line, pie)
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Stok Miktarı',
+                    data: dataValues,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
                 }
-            </ul>
-        </nav>
+            }
+        });
     }
-    else
-    {
-        <p>Sayfa numaraları bulunamadı.</p>
-    }
-}
-else
-{
-    <p>Tablo yüklenemedi.</p>
-}
+
+    // Hastane seçildiğinde grafik güncelle
+    document.getElementById('hospitalSelect').addEventListener('change', function () {
+        const hospitalId = this.value;
+        updateChart(hospitalId);
+    });
+
+    // Sayfa yüklendiğinde grafik göster
+    updateChart();
+</script>

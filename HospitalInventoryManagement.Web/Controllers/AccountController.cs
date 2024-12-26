@@ -1,6 +1,9 @@
-﻿using HospitalInventoryManagement.Data.Context;
+﻿using System.Security.Claims;
+using HospitalInventoryManagement.Data.Context;
 using HospitalInventoryManagement.Data.Models;
 using HospitalInventoryManagement.Web.ViewModel;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -27,7 +30,7 @@ namespace HospitalInventoryManagement.Web.Controllers
         [HttpGet]
         public IActionResult Register()
         {
-            ViewBag.Hospitals = new SelectList(_context.Hospitals, "HospitalID", "HospitalName"); 
+            ViewBag.Hospitals = new SelectList(_context.Hospitals, "HospitalID", "HospitalName");
             // Hastaneleri doğrudan ApplicationDbContext üzerinden alıyoruz
             return View();
         }
@@ -83,7 +86,7 @@ namespace HospitalInventoryManagement.Web.Controllers
 
         // Login POST
         [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel model)
+        public async Task<IActionResult> Login([FromForm] LoginViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -92,14 +95,23 @@ namespace HospitalInventoryManagement.Web.Controllers
 
                 if (user != null)
                 {
-                    var result = await _signInManager.PasswordSignInAsync(user.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
+                    var result = await _signInManager.PasswordSignInAsync(
+                        user.UserName,
+                        model.Password,
+                        model.RememberMe,
+                        lockoutOnFailure: false
+                    );
+
                     if (result.Succeeded)
                     {
+                        // Kullanıcı başarılı şekilde giriş yaptı
                         return RedirectToAction("Index", "Home");
                     }
                 }
+
                 ModelState.AddModelError(string.Empty, "Geçersiz giriş denemesi.");
             }
+
             return View(model);
         }
 

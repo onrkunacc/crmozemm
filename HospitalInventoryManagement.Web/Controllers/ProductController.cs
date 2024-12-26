@@ -68,7 +68,7 @@ namespace HospitalInventoryManagement.Web.Controllers
                     {
                         ProductName = model.ProductName,
                         ReferenceNumber = model.ReferenceNumber,
-                        LotNumber = model.LotNumber,
+                        FlaconCountPerBox = model.FlaconCountPerBox,
                         BoxTextCount = model.BoxTextCount,
                         CategoryID = model.CategoryID,
                         TypeID = model.TypeID,
@@ -118,7 +118,7 @@ namespace HospitalInventoryManagement.Web.Controllers
                 ProductID = product.ProductID,
                 ProductName = product.ProductName,
                 ReferenceNumber = product.ReferenceNumber,
-                LotNumber = product.LotNumber,
+                FlaconCountPerBox = product.FlaconCountPerBox,
                 BoxTextCount = product.BoxTextCount,
                 CategoryID = product.CategoryID,
                 TypeID = product.TypeID,
@@ -157,7 +157,7 @@ namespace HospitalInventoryManagement.Web.Controllers
                 // Ürün güncelleme işlemleri
                 product.ProductName = model.ProductName;
                 product.ReferenceNumber = model.ReferenceNumber;
-                product.LotNumber = model.LotNumber;
+                product.FlaconCountPerBox = model.FlaconCountPerBox;
                 product.BoxTextCount = model.BoxTextCount;
                 product.CategoryID = model.CategoryID;
                 product.TypeID = model.TypeID;

@@ -15,7 +15,7 @@
                 <div class="card">
                     <div class="card-body">
                         <form asp-action="Edit" method="post">
-                            <input type="hidden" asp-for="ProductID"/>
+                            <input type="hidden" asp-for="ProductID" />
                             <div class="mb-3">
                                 <label asp-for="ProductName" class="form-label">Ürün Adı :</label>
                                 <input class="form-control" asp-for="ProductName">
@@ -25,8 +25,8 @@
                                 <input class="form-control" asp-for="ReferenceNumber">
                             </div>
                             <div class="mb-3">
-                                <label asp-for="LotNumber" class="form-label">Lot Numarası :</label>
-                                <input class="form-control" asp-for="LotNumber">
+                                <label asp-for="FlaconCountPerBox" class="form-label">Kutu Flakon Sayısı :</label>
+                                <input class="form-control" asp-for="FlaconCountPerBox">
                             </div>
                             <div class="mb-3">
                                 <label asp-for="BoxTextCount" class="form-label">Kutu Test Adedi :</label>
