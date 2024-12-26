@@ -4,14 +4,29 @@
 
 @{
     var user = await UserManager.GetUserAsync(User);
-    string hospitalName = "Bilinmiyor";
+    string activeUserMessage = "Bilinmiyor";
+    string roleBasedMessage = "Hoş Geldiniz";
 
     if (user != null)
     {
-        var isAdmin = await UserManager.IsInRoleAsync(user, "Admin");
-        hospitalName = isAdmin
-            ? "Admin"
-            : Context.Hospitals.FirstOrDefault(h => h.HospitalID == user.HospitalID)?.HospitalName ?? "Hastane Bilgisi Bulunamadı";
+        if (await UserManager.IsInRoleAsync(user, "Admin"))
+        {
+            activeUserMessage = "Aktif Kullanıcı: Admin";
+            roleBasedMessage = "Yönetici Paneli";
+        }
+        else if (await UserManager.IsInRoleAsync(user, "DocumentRole"))
+        {
+            activeUserMessage = "Aktif Kullanıcı: Evrak Takip Kullanıcısı";
+        }
+        else if (await UserManager.IsInRoleAsync(user, "InvoiceRole"))
+        {
+            activeUserMessage = "Aktif Kullanıcı: Fatura Takip Kullanıcısı";
+        }
+        else
+        {
+            var hospital = Context.Hospitals.FirstOrDefault(h => h.HospitalID == user.HospitalID);
+            activeUserMessage = $"Aktif Kullanıcı: {hospital?.HospitalName ?? "Hastane Bilgisi Bulunamadı"}";
+        }
     }
 }
 
@@ -20,7 +35,10 @@
     <div id="currentTime" class="me-3" style="font-weight: bold; font-size: 1rem;"></div>
 
     <!-- Aktif Kullanıcı -->
-    <span class="me-3">Aktif Kullanıcı: <strong>@hospitalName</strong></span>
+    <span class="me-3">@activeUserMessage</span>
+
+    <!-- Kullanıcı Rolüne Göre Mesaj -->
+    <span class="me-3">@roleBasedMessage</span>
 
     <!-- Çıkış Yap butonu -->
     <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">

@@ -62,7 +62,12 @@ builder.Services.Configure<IdentityOptions>(options =>
 var app = builder.Build();
 
 // Rolleri seed eden bir fonksiyon eklemek
+using (var scope = app.Services.CreateScope())
+{
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
+    await SeedUsers.Initialize(scope.ServiceProvider);
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

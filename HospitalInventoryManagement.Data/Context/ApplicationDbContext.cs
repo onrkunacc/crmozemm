@@ -21,6 +21,8 @@ namespace HospitalInventoryManagement.Data.Context
         public DbSet<TestTemplate> TestTemplates { get; set; }
         public DbSet<ProductRequest> ProductRequests { get; set; }
         public DbSet<ErrorLogs> ErrorLogs { get; set; }
+        public DbSet<DocumentCategory> DocumentCategories { get; set; }
+        public DbSet<FollowDocument> FollowDocuments { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
