@@ -1,29 +1,97 @@
 ﻿<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@ViewData["Title"] - Document Area</title>
-    <link rel="stylesheet" href="~/css/site.css" />
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>@ViewData["Title"] - OZEM</title>
+	<link rel="shortcut icon" type="image/png" href="~/Modernize-1.0.0/src/assets/images/logos/logo.jpg" />
+	<link rel="stylesheet" href="~/Modernize-1.0.0/src/assets/css/styles.css" />
+	<link rel="stylesheet" href="~/css/site.css" />
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
 </head>
 <body>
-    <div class="page-wrapper">
-        <header class="app-header">
-            <nav>
-                <ul>
-                    <li><a href="@Url.Action("Index", "Document", new { area = "Document" })">Evrak Takip</a></li>
-                    <li><a href="@Url.Action("AddDocument", "Document", new { area = "Document" })">Evrak Ekle</a></li>
-                    @if (User.IsInRole("Admin"))
-                    {
-                        <li><a href="@Url.Action("Index", "Home", new { area = "" })">Admin Paneline Dön</a></li>
-                    }
-                </ul>
-            </nav>
-        </header>
+	<div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
+		 data-sidebar-position="fixed" data-header-position="fixed">
+		<!-- Sidebar Start -->
+		<aside class="left-sidebar closed collapse d-md-block" id="sidebar">
+			<div>
+				<div class="brand-logo d-flex align-items-center justify-content-between">
+					<a href="@Url.Action("Index", "Home")" class="text-nowrap logo-img">
+						<img src="~/Modernize-1.0.0/src/assets/images/logos/logo.jpg" width="180" alt="" />
+					</a>
+					@*  <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
+                        <i class="ti ti-x fs-8"></i>
+                    </div> *@
+					<button class="btn btn-close d-md-none" data-bs-toggle="collapse" data-bs-target="#sidebar"></button>
+				</div>
 
-        <div class="container">
-            @RenderBody()
-        </div>
-    </div>
+				<nav class="sidebar-nav scroll-sidebar" data-simplebar="">
+					<ul id="sidebarnav">
+						<li class="sidebar-item">
+							<a class="sidebar-link" href="@Url.Action("Index", "Document", new { area = "Document" })" aria-expanded="false">
+								<span><i class="ti ti-file"></i></span>
+								<span class="hide-menu">Evrak Takip</span>
+							</a>
+						</li>
+						<li class="sidebar-item">
+							<a class="sidebar-link" href="@Url.Action("AddDocument", "Document", new { area = "Document" })" aria-expanded="false">
+								<span><i class="ti ti-circle-plus"></i></span>
+								<span class="hide-menu">Evrak Ekle</span>
+							</a>
+						</li>
+						@if (User.IsInRole("Admin"))
+						{
+							<li class="sidebar-item">
+								<a class="sidebar-link" href="@Url.Action("Index", "Home", new { area = "" })" aria-expanded="false">
+									<span><i class="ti ti-arrow-back-up"></i></span>
+									<span class="hide-menu">Admin Paneline Dön</span>
+								</a>
+							</li>
+						}
+					</ul>
+				</nav>
+			</div>
+		</aside>
+
+		<div class="body-wrapper sidebar-collapsed">
+			<!-- Header -->
+			<header class="app-header">
+				<nav class="navbar navbar-expand-lg navbar-light bg-light">
+					<div class="container-fluid">
+						<!-- Sağ üst köşede kullanıcı bilgisi -->
+						<div class="d-flex align-items-center ms-auto">
+							@if (User.Identity.IsAuthenticated)
+							{
+								@await Html.PartialAsync("_UserHospitalInfo")
+							}
+							else
+							{
+								<a href="@Url.Action("Login", "Account")" class="btn btn-outline-primary">
+									<i class="ti ti-login"></i> Giriş Yap
+								</a>
+							}
+						</div>
+					</div>
+				</nav>
+			</header>
+
+			<!-- Ana İçerik -->
+			<div class="container-fluid">
+				@RenderBody()
+			</div>
+		</div>
+		<!-- Sidebar End -->
+	</div>
+
+	<!-- Scripts -->
+	<script src="~/Modernize-1.0.0/src/assets/libs/jquery/dist/jquery.min.js"></script>
+	<script src="~/Modernize-1.0.0/src/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="~/Modernize-1.0.0/src/assets/js/sidebarmenu.js"></script>
+	<script src="~/Modernize-1.0.0/src/assets/js/app.min.js"></script>
+	<script src="~/Modernize-1.0.0/src/assets/libs/apexcharts/dist/apexcharts.min.js"></script>
+	<script src="~/Modernize-1.0.0/src/assets/libs/simplebar/dist/simplebar.js"></script>
+	<script src="~/Modernize-1.0.0/src/assets/js/dashboard.js"></script>
+	@RenderSection("Scripts", required: false)
 </body>
 </html>

@@ -104,8 +104,20 @@ namespace HospitalInventoryManagement.Web.Controllers
 
                     if (result.Succeeded)
                     {
-                        // Kullanıcı başarılı şekilde giriş yaptı
-                        return RedirectToAction("Index", "Home");
+                        var roles = await _userManager.GetRolesAsync(user);
+                        if (roles.Contains("DocumentRole"))
+                        {
+                            return RedirectToAction("Index", "Document", new { area = "Document" });
+                        }
+                        else if(roles.Contains("Admin"))
+                        {
+                            return RedirectToAction("Index", "Home");
+                        }
+                        else
+                        {
+                            // Kullanıcı başarılı şekilde giriş yaptı
+                            return RedirectToAction("Index", "Home");
+                        }
                     }
                 }
 
