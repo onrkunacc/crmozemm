@@ -1,38 +1,46 @@
 ﻿@model HospitalInventoryManagement.Data.Models.FollowDocument
+
 @{
     ViewData["Title"] = "Evrak Ekle";
     Layout = "~/Areas/Document/Views/Shared/_Layout.cshtml";
 }
 
 <div class="container-fluid">
-    <div class="container-fluid">
-        <div class="card">
-            <div class="card-body">
-                <h1 class="card-title fw-semibold mb-4">Yeni Evrak Girişi</h1>
-                <div class="card">
-                    <div class="card-body">
-                        <form asp-action="AddDocument" method="post">                           
-                            <div class="mb-3">
-                                <label asp-for="Code" class="form-label">Kod :</label>
-                                <input asp-for="Code"  class="form-control">
-                                <span asp-validation-for="code" class="text-danger"></span>
-                            </div>
-                            <div class="mb-3">
-                                <label asp-for="Subject" class="form-label">Konu :</label>
-                                <input asp-for="Subject" class="form-control">
-                                <span asp-validation-for="Subject" class="text-danger"></span>
-                            </div>
-                            <div class="mb-3">
-                                <label for="CategoryID" class="form-label">Kategori :</label>
-                                <select asp-for="CategoryID" class="form-control" asp-items="new SelectList(ViewBag.Categories, " Id", "Description" )"></select>
-                                <span asp-validation-for="CategoryID" class="text-danger"></span>
-                            </div>
-                            <button type="submit" class="btn btn-primary m-1">Kaydet</button>
-                            <a asp-action="Index" class="btn btn-secondary m-1">İptal</a>
-                        </form>
-                    </div>
+    <div class="card">
+        <div class="card-body">
+            <h1 class="card-title fw-semibold mb-4">Yeni Evrak Girişi</h1>
+            <form asp-action="AddDocument" method="post">
+                <div class="mb-3">
+                    <label for="CategoryId">Kategori</label>
+                    <select id="CategoryDropdown" name="CategoryId" class="form-control">
+                        <option value="">Seçiniz</option>
+                    </select>
+                    <span asp-validation-for="CategoryId" class="text-danger"></span>
                 </div>
-            </div>
+                <div class="mb-3">
+                    <label asp-for="Subject" class="form-label">Konu :</label>
+                    <input asp-for="Subject" type="text" name="Subject" class="form-control" />
+                    <span asp-validation-for="Subject" class="text-danger"></span>
+                </div>
+                <button type="submit" class="btn btn-primary">Kaydet</button>
+            </form>
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const dropdown = document.getElementById('CategoryDropdown');
+        fetch('/Document/Document/GetCategories')
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category.id; // Category ID
+                    option.textContent = category.description; // Category Description
+                    dropdown.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Kategori yüklenirken hata oluştu:', error));
+    });
+</script>

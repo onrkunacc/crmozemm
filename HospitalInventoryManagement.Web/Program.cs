@@ -38,7 +38,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.Cookie.IsEssential = true;
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // HTTPS zorunlu
         options.Cookie.SameSite = SameSiteMode.Lax; // Çapraz site cookie kullanýmý
-        options.LoginPath = "/Account/Login"; // Giriþ sayfasý
+        options.LoginPath = "/Account/Login";
         options.AccessDeniedPath = "/Account/AccessDenied"; // Yetkisiz eriþim
         options.ExpireTimeSpan = TimeSpan.FromDays(7); // Cookie süresi
         options.SlidingExpiration = true; // Kullanýcý aktifken süreyi uzat

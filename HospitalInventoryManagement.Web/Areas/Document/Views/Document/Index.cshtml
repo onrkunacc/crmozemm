@@ -13,7 +13,6 @@
             <th>Konu</th>
             <th>Kategori</th>
             <th>Tarih</th>
-            <th>Kullanıcı</th>
         </tr>
     </thead>
     <tbody>
@@ -24,7 +23,6 @@
                 <td>@document.Subject</td>
                 <td>@document.Category?.Description</td>
                 <td>@document.Date.ToString("dd.MM.yyyy HH:mm")</td>
-                <td>@document.UserID</td>
             </tr>
         }
     </tbody>

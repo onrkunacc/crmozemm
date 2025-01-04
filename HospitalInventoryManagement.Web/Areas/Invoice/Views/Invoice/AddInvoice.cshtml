@@ -1,0 +1,58 @@
+﻿@model HospitalInventoryManagement.Data.Models.Invoices
+
+@{
+    ViewData["Title"] = "Yeni Fatura Ekle";
+    Layout = "~/Areas/Invoice/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <h2>Yeni Fatura Ekle</h2>
+    <form asp-action="AddInvoice" method="post">
+        <div class="mb-3">
+            <label for="CariId" class="form-label">Cari:</label>
+            <select id="CariId" name="CariId" class="form-control">
+                <option value="">Seçiniz</option>
+                @foreach (var cari in ViewBag.Cariler)
+                {
+                    <option value="@cari.Id">@cari.Unvan</option>
+                }
+            </select>
+            <span asp-validation-for="CariId" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Donemi" class="form-label">Dönem:</label>
+            <input asp-for="Donemi" class="form-control" />
+            <span asp-validation-for="Donem" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label for="Ay" class="form-label">Ay:</label>
+            <select asp-for="Ay" class="form-control">
+                <option value="1">Ocak</option>
+                <option value="2">Şubat</option>
+                <option value="3">Mart</option>
+                <option value="4">Nisan</option>
+                <option value="5">Mayıs</option>
+                <option value="6">Haziran</option>
+                <option value="7">Temmuz</option>
+                <option value="8">Ağustos</option>
+                <option value="9">Eylül</option>
+                <option value="10">Ekim</option>
+                <option value="11">Kasım</option>
+                <option value="12">Aralık</option>
+            </select>
+            <span asp-validation-for="Ay" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Tutar" class="form-label">Tutar:</label>
+            <input asp-for="Tutar" class="form-control" />
+            <span asp-validation-for="Tutar" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp -for= "KapanisTarihi" class="form-label">Kapanış Tarihi:</label>
+            <input asp-for="KapanisTarihi" type="date" class="form-control" />
+            <span asp-validation-for="KapanisTarihi" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-primary">Kaydet</button>
+        <a asp-action="Index" class="btn btn-secondary">İptal</a>
+    </form>
+</div>

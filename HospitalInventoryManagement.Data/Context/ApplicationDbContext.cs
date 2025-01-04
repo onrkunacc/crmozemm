@@ -23,7 +23,9 @@ namespace HospitalInventoryManagement.Data.Context
         public DbSet<ErrorLogs> ErrorLogs { get; set; }
         public DbSet<DocumentCategory> DocumentCategories { get; set; }
         public DbSet<FollowDocument> FollowDocuments { get; set; }
-
+        public DbSet<Invoices> Invoices { get; set; }
+        public DbSet<Cariler> Cariler { get; set; }
+        public DbSet<CariGruplari> CariGruplari { get; set; }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
@@ -113,6 +115,10 @@ namespace HospitalInventoryManagement.Data.Context
                 .WithMany()
                 .HasForeignKey(pr => pr.RequestedByUserID)
                 .OnDelete(DeleteBehavior.Restrict); // Silme davranışı
+
+            builder.Entity<CariGruplari>().ToTable("CariGruplari");
+            builder.Entity<Cariler>().ToTable("Cariler");
+            builder.Entity<Invoices>().ToTable("Invoices");
 
         }
     }

@@ -1,0 +1,55 @@
+﻿@model HospitalInventoryManagement.Data.Models.Cariler
+
+@{
+    ViewData["Title"] = "Yeni Cari Ekle";
+    Layout = "~/Areas/Invoice/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <h2>Yeni Cari Ekle</h2>
+
+    <form asp-action="Create" method="post">
+        <div class="mb-3">
+            <label asp-for="CariKodu" class="form-label">Cari Kodu</label>
+            <input asp-for="CariKodu" class="form-control" />
+            <span asp-validation-for="CariKodu" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Unvan" class="form-label">Unvan</label>
+            <input asp-for="Unvan" class="form-control" />
+            <span asp-validation-for="Unvan" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label for="CariGrubuId" class="form-label">Cari Grubu:</label>
+            <select asp-for="CariGrubuId" class="form-control" asp-items="ViewBag.CariGruplari"></select>
+            <span asp-validation-for="CariGrubuId" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="TeklifNo" class="form-label">Teklif No</label>
+            <input asp-for="TeklifNo" class="form-control" />
+            <span asp-validation-for="TeklifNo" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="IhaleNo" class="form-label">İhale No</label>
+            <input asp-for="IhaleNo" class="form-control" />
+            <span asp-validation-for="IhaleNo" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Tevkifat" class="form-label">Tevkifat</label>
+            <select asp-for="Tevkifat" class="form-control">
+                <option value="true">Evet</option>
+                <option value="false">Hayır</option>
+            </select>
+            <span asp-validation-for="Tevkifat" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="KapanisTarihi" class="form-label">Kapanış Tarihi</label>
+            <input asp-for="KapanisTarihi" class="form-control" type="date" />
+            <span asp-validation-for="KapanisTarihi" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-success">Kaydet</button>
+        <a asp-action="Index" class="btn btn-secondary">İptal</a>
+    </form>
+</div>
+

@@ -109,6 +109,10 @@ namespace HospitalInventoryManagement.Web.Controllers
                         {
                             return RedirectToAction("Index", "Document", new { area = "Document" });
                         }
+                        else if (roles.Contains("InvoiceRole"))
+                        {
+                            return RedirectToAction("Index", "Invoice", new { area = "Invoice" });
+                        }
                         else if(roles.Contains("Admin"))
                         {
                             return RedirectToAction("Index", "Home");
