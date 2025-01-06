@@ -7,13 +7,14 @@
 
 <div class="container mt-4">
     <h2>Fatura Listesi</h2>
-    <table class="table table-bordered">
+    <table class="table">
         <thead>
             <tr>
                 <th>Cari Unvanı</th>
                 <th>Dönem</th>
                 <th>Ay</th>
                 <th>Tutar</th>
+                <th>Ekler</th>
                 <th>İşlemler</th>
             </tr>
         </thead>
@@ -24,7 +25,9 @@
                     <td>@invoice.Cari.Unvan</td>
                     <td>@invoice.Donemi</td>
                     <td>@invoice.Ay</td>
-                    <td>@invoice.Tutar</td>
+                    <td>@invoice.Tutar.ToString("N2", new System.Globalization.CultureInfo("tr-TR"))</td>
+
+                    <td>@invoice.Ekler</td>
                     <td>
                         <a asp-action="Details" asp-route-id="@invoice.Id" class="btn btn-info btn-sm">Detay</a>
                         <form asp-action="Delete" asp-route-id="@invoice.Id" method="post" class="d-inline">

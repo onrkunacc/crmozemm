@@ -7,6 +7,17 @@
 
 <div class="container mt-4">
     <h2>Yeni Fatura Ekle</h2>
+
+    <!-- Başarı ve hata mesajlarını göstermek -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
     <form asp-action="AddInvoice" method="post">
         <div class="mb-3">
             <label for="CariId" class="form-label">Cari:</label>
@@ -19,14 +30,15 @@
             </select>
             <span asp-validation-for="CariId" class="text-danger"></span>
         </div>
+
         <div class="mb-3">
-            <label asp-for="Donemi" class="form-label">Dönem:</label>
-            <input asp-for="Donemi" class="form-control" />
-            <span asp-validation-for="Donem" class="text-danger"></span>
+            <label asp-for="Donemi" class="form-label">Dönem (Yıl):</label>
+            <input name="Donemi" type="number" class="form-control" />
         </div>
+
         <div class="mb-3">
-            <label for="Ay" class="form-label">Ay:</label>
-            <select asp-for="Ay" class="form-control">
+            <label asp-for="Ay" class="form-label">Ay:</label>
+            <select name="Ay" class="form-control">
                 <option value="1">Ocak</option>
                 <option value="2">Şubat</option>
                 <option value="3">Mart</option>
@@ -42,17 +54,36 @@
             </select>
             <span asp-validation-for="Ay" class="text-danger"></span>
         </div>
+
         <div class="mb-3">
             <label asp-for="Tutar" class="form-label">Tutar:</label>
-            <input asp-for="Tutar" class="form-control" />
+            <input name="Tutar"
+                   type="text"
+                   class="form-control"
+                   oninput="formatCurrency(this)"
+                   value="@Model.Tutar.ToString("N2", new System.Globalization.CultureInfo("tr-TR"))" />
             <span asp-validation-for="Tutar" class="text-danger"></span>
         </div>
+
         <div class="mb-3">
-            <label asp -for= "KapanisTarihi" class="form-label">Kapanış Tarihi:</label>
-            <input asp-for="KapanisTarihi" type="date" class="form-control" />
-            <span asp-validation-for="KapanisTarihi" class="text-danger"></span>
+            <label asp-for="Ekler" class="form-label">Ekler:</label>
+            <textarea name="Ekler" class="form-control"></textarea>
+            <span asp-validation-for="Ekler" class="text-danger"></span>
         </div>
+
         <button type="submit" class="btn btn-primary">Kaydet</button>
-        <a asp-action="Index" class="btn btn-secondary">İptal</a>
+        <a href="~/Invoice/Invoice/Index" class="btn btn-secondary">İptal</a>
     </form>
 </div>
+<script>
+    function formatCurrency(input) {
+        // Mevcut değeri al ve sadece sayı ile virgül karakterlerini tut
+        let value = input.value.replace(/[^0-9,]/g, '');
+
+        // Nokta ile ayrılmış binlik formatı ekle
+        let parts = value.split(',');
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+        input.value = parts.join(',');
+    }
+</script>

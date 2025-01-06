@@ -19,7 +19,8 @@
             <p><strong>Teklif No:</strong> @Model.TeklifNo</p>
             <p><strong>İhale No:</strong> @Model.IhaleNo</p>
             <p><strong>Tevkifat:</strong> @(Model.Tevkifat ? "Evet" : "Hayır")</p>
-            <p><strong>Kapanış Tarihi:</strong> @Model.KapanisTarihi?.ToString("dd.MM.yyyy") ?? "Belirtilmemiş"</p>
+            <p><strong>İl:</strong> @Model.Il</p>
+            <p><strong>İlçe:</strong> @Model.Ilce</p>
         </div>
     </div>
 
@@ -61,5 +62,6 @@
         </tbody>
     </table>
 
-    <a asp-action="Index" class="btn btn-secondary mt-3">Geri Dön</a>
+    <a onclick ="window.location.href='/Invoice/Invoice/EditInvoice/@Model.Id';" class="btn btn-primary mt-3"> Fatura Düzenle</a>
+    <a href="~/Invoice/Cari/Index" class="btn btn-secondary mt-3">Geri Dön</a>
 </div>

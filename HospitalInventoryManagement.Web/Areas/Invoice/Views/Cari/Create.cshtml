@@ -43,11 +43,15 @@
             <span asp-validation-for="Tevkifat" class="text-danger"></span>
         </div>
         <div class="mb-3">
-            <label asp-for="KapanisTarihi" class="form-label">Kapanış Tarihi</label>
-            <input asp-for="KapanisTarihi" class="form-control" type="date" />
-            <span asp-validation-for="KapanisTarihi" class="text-danger"></span>
+            <label asp-for="Il" class="form-label">İl</label>
+            <input asp-for="Il" class="form-control"/>
+            <span asp-validation-for="Il" class="text-danger"></span>
         </div>
-
+        <div class="mb-3">
+            <label asp-for="Ilce" class="form-label">İlçe</label>
+            <input asp-for="Ilce" class="form-control" />
+            <span asp-validation-for="Ilce" class="text-danger"></span>
+        </div>
         <button type="submit" class="btn btn-success">Kaydet</button>
         <a asp-action="Index" class="btn btn-secondary">İptal</a>
     </form>

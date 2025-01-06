@@ -34,7 +34,6 @@ namespace HospitalInventoryManagement.Web.Areas.Invoice.Controllers
 
         // Yeni Cari Ekleme (Post İşlemi)
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Cariler cari)
         {
             if (ModelState.IsValid)
@@ -46,53 +45,6 @@ namespace HospitalInventoryManagement.Web.Areas.Invoice.Controllers
 
             ViewBag.CariGruplari = _context.CariGruplari.ToList();
             return View(cari);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> EditInvoice(int id)
-        {
-            var invoice = await _context.Invoices.FindAsync(id);
-
-            if (invoice == null)
-            {
-                return NotFound();
-            }
-
-            return View(invoice);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> EditInvoice(Invoices updatedInvoice)
-        {
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    var invoice = await _context.Invoices.FindAsync(updatedInvoice.Id);
-
-                    if (invoice == null)
-                    {
-                        return NotFound();
-                    }
-
-                    // Verileri güncelle
-                    invoice.Tutar = updatedInvoice.Tutar;
-                    invoice.KapanisTarihi = updatedInvoice.KapanisTarihi;
-                    invoice.Donemi = updatedInvoice.Donemi;
-                    invoice.Ay = updatedInvoice.Ay;
-
-                    _context.Invoices.Update(invoice);
-                    await _context.SaveChangesAsync();
-
-                    return RedirectToAction("Details", new { id = invoice.CariId });
-                }
-                catch (Exception ex)
-                {
-                    ModelState.AddModelError("", "Fatura düzenlenirken bir hata oluştu: " + ex.Message);
-                }
-            }
-
-            return View(updatedInvoice);
         }
 
         // Cari Detayları

@@ -7,13 +7,14 @@
 <div class="container mt-4">
     <h2>Cari Listesi</h2>
 
-    <table class="table table-bordered">
+    <table class="table">
         <thead>
             <tr>
                 <th>Cari Kodu</th>
                 <th>Unvan</th>
                 <th>Cari Grubu</th>
-                <th>Kapanış Tarihi</th>
+                <th>İl</th>
+                <th>İlçe</th>
                 <th>İşlemler</th>
             </tr>
         </thead>
@@ -24,7 +25,8 @@
                     <td>@cari.CariKodu</td>
                     <td>@cari.Unvan</td>
                     <td>@cari.CariGrubu?.GrupAdi</td>
-                    <td>@(cari.KapanisTarihi.HasValue ? cari.KapanisTarihi.Value.ToString("dd.MM.yyyy") : "Belirtilmemiş")</td>
+                    <td>@cari.Il</td>
+                    <td>@cari.Ilce</td>
                     <td>
                         <a class="btn btn-info btn-sm" onclick="window.location.href='/Invoice/Cari/Details/@cari.Id';">Detaylar</a>
                         <form asp-action="Delete" asp-route-id="@cari.Id" method="post" class="d-inline">

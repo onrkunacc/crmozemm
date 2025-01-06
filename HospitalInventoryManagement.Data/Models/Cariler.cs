@@ -18,6 +18,8 @@ namespace HospitalInventoryManagement.Data.Models
         public int CariGrubuId { get; set; } // Foreign Key
         public CariGruplari CariGrubu { get; set; } // Navigation Property
 
+        public string? Il { get; set; }
+        public string? Ilce { get; set; }
         public ICollection<Invoices> Invoices { get; set; } // Bir carinin birden fazla faturası olabilir
     }
 }
