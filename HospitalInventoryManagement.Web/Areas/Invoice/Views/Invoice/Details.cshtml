@@ -8,9 +8,9 @@
 <div class="container mt-4">
     <h2>Fatura Detayları</h2>
     <p><strong>Cari Unvanı:</strong> @Model.Cari.Unvan</p>
+    <p><strong>İl :</strong> @Model.Cari.Il</p>
     <p><strong>Dönem:</strong> @Model.Donemi</p>
     <p><strong>Ay:</strong> @Model.Ay</p>
     <p><strong>Tutar:</strong> @Model.Tutar</p>
-    <p><strong>Kapanış Tarihi:</strong> @Model.KapanisTarihi?.ToString("yyyy-MM-dd")</p>
-    <a asp-action="Index" class="btn btn-secondary">Geri Dön</a>
+    <a href="~/Invoice/Invoice/Index" class="btn btn-secondary mt-3">Geri Dön</a>
 </div>

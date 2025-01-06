@@ -10,7 +10,6 @@
     <Folder Include="Areas\Document\Data\" />
     <Folder Include="Areas\Document\Models\" />
     <Folder Include="Areas\Invoice\Data\" />
-    <Folder Include="Areas\Invoice\Models\" />
     <Folder Include="Models\" />
   </ItemGroup>
 

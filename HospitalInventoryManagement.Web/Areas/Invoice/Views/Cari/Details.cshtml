@@ -1,10 +1,10 @@
-﻿@model HospitalInventoryManagement.Data.Models.Cariler
+﻿@model dynamic
 
 @{
-    ViewData["Title"] = "Cari Detayları";
-    Layout = "~/Areas/Invoice/Views/Shared/_Layout.cshtml";
-
-    var faturalar = ViewBag.Faturalar as List<dynamic>; // ViewBag'den listeyi al
+    var cari = Model.Cari;
+    var faturalar = Model.Faturalar as List<FaturaViewModel>;
+    int currentYear = Model.CurrentYear;
+    var availableYears = Model.AvailableYears as List<int>;
 }
 
 <div class="container mt-4">
@@ -13,55 +13,69 @@
     <div class="row">
         <div class="col-md-6">
             <h5>Temel Bilgiler</h5>
-            <p><strong>Cari Kodu:</strong> @Model.CariKodu</p>
-            <p><strong>Unvan:</strong> @Model.Unvan</p>
-            <p><strong>Cari Grubu:</strong> @Model.CariGrubu?.GrupAdi</p>
-            <p><strong>Teklif No:</strong> @Model.TeklifNo</p>
-            <p><strong>İhale No:</strong> @Model.IhaleNo</p>
-            <p><strong>Tevkifat:</strong> @(Model.Tevkifat ? "Evet" : "Hayır")</p>
-            <p><strong>İl:</strong> @Model.Il</p>
-            <p><strong>İlçe:</strong> @Model.Ilce</p>
+            <p><strong>Cari Kodu:</strong> @cari.CariKodu</p>
+            <p><strong>Unvan:</strong> @cari.Unvan</p>
+            <p><strong>Cari Grubu:</strong> @cari.CariGrubu?.GrupAdi</p>
+        </div>
+        <div class="col-md-6">
+            <label for="yearFilter" class="form-label">Dönem Seç:</label>
+            <select id="yearFilter" class="form-control" onchange="filterByYear(this.value)">
+                @foreach (var year in availableYears)
+                {
+                    <option value="@year" @(year == currentYear ? "selected" : "")>@year</option>
+                }
+            </select>
         </div>
     </div>
 
     <hr />
 
-    <h5>Fatura Bilgileri</h5>
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Ay</th>
-                <th>Fatura Tutarı</th>
-                <th>Kapanış Tarihi</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var ay in new[]
-            {
-                 new { AyAdi = "Ocak", AyIndex = 1 },
-                 new { AyAdi = "Şubat", AyIndex = 2 },
-                 new { AyAdi = "Mart", AyIndex = 3 },
-                 new { AyAdi = "Nisan", AyIndex = 4 },
-                 new { AyAdi = "Mayıs", AyIndex = 5 },
-                 new { AyAdi = "Haziran", AyIndex = 6 },
-                 new { AyAdi = "Temmuz", AyIndex = 7 },
-                 new { AyAdi = "Ağustos", AyIndex = 8 },
-                 new { AyAdi = "Eylül", AyIndex = 9 },
-                 new { AyAdi = "Ekim", AyIndex = 10 },
-                 new { AyAdi = "Kasım", AyIndex = 11 },
-                 new { AyAdi = "Aralık", AyIndex = 12 }
-            })
-            {
-                var fatura = faturalar?.FirstOrDefault(f => f.AyIndex == ay.AyIndex);
+    <h5>Fatura Bilgileri (Dönem: @currentYear)</h5>
+    @if (faturalar != null && faturalar.Count > 0)
+    {
+        <table class="table table-bordered">
+            <thead>
                 <tr>
-                    <td>@ay.AyAdi</td>
-                    <td>@(fatura?.Fatura?.Tutar.ToString("C") ?? "Henüz girilmemiş")</td>
-                    <td>@(fatura?.Fatura?.KapanisTarihi?.ToString("dd.MM.yyyy") ?? "Belirtilmemiş")</td>
+                    <th>Ay</th>
+                    <th>Fatura Tutarı</th>
+                    <th>İşlemler</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var fatura in faturalar)
+                {
+                    <tr>
+                        <td>@fatura.AyAdi</td>
+                        <td>@(fatura.Tutar?.ToString("C") ?? "Henüz girilmemiş")</td>
+                        <td>
+                            @if (fatura.FaturaVarMi)
+                            {
 
-    <a onclick ="window.location.href='/Invoice/Invoice/EditInvoice/@Model.Id';" class="btn btn-primary mt-3"> Fatura Düzenle</a>
+                                <a href="@Url.Action("EditInvoice", "Invoice", new { area = "Invoice", cariId = cari.Id, month = fatura.AyIndex, year = currentYear })"
+                                   class="btn btn-primary btn-sm">Düzenle</a>
+
+                            }
+                            else
+                            {
+                                <a href="@Url.Action("AddInvoice", "Invoice", new { area = "Invoice", cariId = cari.Id, ay = fatura.AyIndex, donem = currentYear })"
+                                   class="btn btn-success btn-sm">Ekle</a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-danger">Fatura bilgisi bulunamadı.</div>
+    }
+
     <a href="~/Invoice/Cari/Index" class="btn btn-secondary mt-3">Geri Dön</a>
 </div>
+
+<script>
+    function filterByYear(year) {
+        window.location.href = `?year=${year}`;
+    }
+</script>

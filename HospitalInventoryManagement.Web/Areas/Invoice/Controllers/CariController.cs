@@ -1,5 +1,6 @@
 ﻿using HospitalInventoryManagement.Data.Context;
 using HospitalInventoryManagement.Data.Models;
+using HospitalInventoryManagement.Web.Areas.Invoice.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -50,10 +51,13 @@ namespace HospitalInventoryManagement.Web.Areas.Invoice.Controllers
         // Cari Detayları
         //Cari İşlemlerini 12 aylık fatura takibini devam ettiriyorum.Son işlemler .
         [Area("Invoice")]
-        [Route("[area]/[controller]/[action]/{id?}")]
-        public async Task<IActionResult> Details(int id)
+        //[Route("[area]/[controller]/[action]/{id?}")]
+        [HttpGet]
+        public async Task<IActionResult> Details(int id, int? year)
         {
-            Console.WriteLine($"Details action invoked with ID: {id}");
+            int currentYear = year ?? DateTime.Now.Year;
+
+            // Cari ve faturaları getir
             var cari = await _context.Cariler
                 .Include(c => c.CariGrubu)
                 .Include(c => c.Invoices)
@@ -61,24 +65,43 @@ namespace HospitalInventoryManagement.Web.Areas.Invoice.Controllers
 
             if (cari == null)
             {
-                return NotFound();
+                return NotFound("Cari bulunamadı.");
             }
 
-            // 12 aylık veri hazırlama
-            var aylar = Enumerable.Range(1, 12).Select(ay => new
-            {
-                AyIndex = ay,
-                AyAdi = new[]
+            // Faturaları filtrele
+            var invoicesForSelectedYear = cari.Invoices
+                .Where(f => f.Donemi == currentYear)
+                .ToList();
+
+            // 12 aylık listeyi oluştur ve faturalarla eşleştir
+            var allMonths = Enumerable.Range(1, 12)
+                .Select(month => new FaturaViewModel
                 {
-                    "Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran",
-                    "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"
-                }[ay - 1],
-                Fatura = cari.Invoices.FirstOrDefault(f => f.Ay == ay)
-            }).ToList();
+                    AyIndex = month,
+                    AyAdi = new[]
+                    {
+                "Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran",
+                "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"
+                    }[month - 1],
+                    Tutar = invoicesForSelectedYear.FirstOrDefault(f => f.Ay == month)?.Tutar,
+                    FaturaVarMi = invoicesForSelectedYear.Any(f => f.Ay == month),
+                    FaturaId = invoicesForSelectedYear.FirstOrDefault(f => f.Ay == month)?.Id
+                }).ToList();
 
-            ViewBag.Faturalar = aylar;
+            // ViewModel'i View'e aktar
+            var viewModel = new
+            {
+                Cari = cari,
+                Faturalar = allMonths,
+                CurrentYear = currentYear,
+                AvailableYears = _context.Invoices
+                    .Where(i => i.CariId == id)
+                    .Select(i => i.Donemi)
+                    .Distinct()
+                    .ToList()
+            };
 
-            return View(cari);
+            return View(viewModel);
         }
 
         // Cari Silme

@@ -7,6 +7,15 @@
 
 <div class="container mt-4">
     <h2>Fatura Listesi</h2>
+    <form asp-action="FilterInvoices" method="get">
+        <div class="mb-3">
+            <label for="year" class="form-label">Dönem:</label>
+            <select id="year" name="year" class="form-control" onchange="this.form.submit()">
+                <option value="2024" @(ViewBag.SelectedYear == 2024 ? "selected" : "")>2024</option>
+                <option value="2025" @(ViewBag.SelectedYear == 2025 ? "selected" : "")>2025</option>
+            </select>
+        </div>
+    </form>
     <table class="table">
         <thead>
             <tr>
@@ -29,7 +38,7 @@
 
                     <td>@invoice.Ekler</td>
                     <td>
-                        <a asp-action="Details" asp-route-id="@invoice.Id" class="btn btn-info btn-sm">Detay</a>
+                        <a onclick="window.location.href='/Invoice/Invoice/Details/@invoice.Id';" class="btn btn-info btn-sm">Detay</a>
                         <form asp-action="Delete" asp-route-id="@invoice.Id" method="post" class="d-inline">
                             <button type="submit" class="btn btn-danger btn-sm">Sil</button>
                         </form>

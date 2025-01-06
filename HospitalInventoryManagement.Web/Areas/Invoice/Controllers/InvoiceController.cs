@@ -103,10 +103,12 @@ namespace HospitalInventoryManagement.Web.Areas.Invoice.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> EditInvoice(int id)
+        public async Task<IActionResult> EditInvoice(int id, int month, int year)
         {
-            var invoice = await _context.Invoices.FindAsync(id);
-
+            
+            var invoice = await _context.Invoices
+                .FirstOrDefaultAsync(i => i.CariId == id && i.Ay == month && i.Donemi == year);
+            Console.WriteLine($"cariId: {id}, month: {month}, year: {year}");
             if (invoice == null)
             {
                 return NotFound();
@@ -114,6 +116,7 @@ namespace HospitalInventoryManagement.Web.Areas.Invoice.Controllers
 
             return View(invoice);
         }
+
 
         [HttpPost]
         public async Task<IActionResult> EditInvoice(Invoices updatedInvoice)
@@ -129,24 +132,35 @@ namespace HospitalInventoryManagement.Web.Areas.Invoice.Controllers
                         return NotFound();
                     }
 
-                    // Verileri güncelle
                     invoice.Tutar = updatedInvoice.Tutar;
                     invoice.KapanisTarihi = updatedInvoice.KapanisTarihi;
-                    invoice.Donemi = updatedInvoice.Donemi;
-                    invoice.Ay = updatedInvoice.Ay;
+                    invoice.Ekler = updatedInvoice.Ekler;
 
                     _context.Invoices.Update(invoice);
                     await _context.SaveChangesAsync();
 
-                    return RedirectToAction("Details", new { id = invoice.CariId });
+                    TempData["SuccessMessage"] = "Fatura başarıyla güncellendi.";
+                    return RedirectToAction("Details", new { id = invoice.CariId, year = invoice.Donemi });
                 }
                 catch (Exception ex)
                 {
-                    ModelState.AddModelError("", "Fatura düzenlenirken bir hata oluştu: " + ex.Message);
+                    ModelState.AddModelError("", $"Bir hata oluştu: {ex.Message}");
                 }
             }
 
             return View(updatedInvoice);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> FilterInvoice (int year)
+        {
+            var invoices = await _context.Invoices
+                .Include(f => f.Cari)
+                .Where(f => f.Donemi == year)
+                .ToListAsync();
+
+            ViewBag.SelectedYear = year;
+            return View("Index", invoices);
         }
 
     }
