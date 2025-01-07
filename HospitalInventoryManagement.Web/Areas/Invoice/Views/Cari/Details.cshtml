@@ -51,7 +51,7 @@
                             @if (fatura.FaturaVarMi)
                             {
 
-                                <a href="@Url.Action("EditInvoice", "Invoice", new { area = "Invoice", cariId = cari.Id, month = fatura.AyIndex, year = currentYear })"
+                                <a href="@Url.Action("EditInvoice", "Invoice", new { area = "Invoice", cariId = fatura.CariId, month = fatura.AyIndex, year = currentYear })"
                                    class="btn btn-primary btn-sm">Düzenle</a>
 
                             }

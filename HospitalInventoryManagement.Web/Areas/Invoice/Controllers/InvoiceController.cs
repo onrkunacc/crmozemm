@@ -1,6 +1,7 @@
 ﻿using System;
 using HospitalInventoryManagement.Data.Context;
 using HospitalInventoryManagement.Data.Models;
+using HospitalInventoryManagement.Web.Areas.Invoice.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -10,6 +11,7 @@ namespace HospitalInventoryManagement.Web.Areas.Invoice.Controllers
 {
     [Area("Invoice")]
     [Authorize(Roles = "InvoiceRole, Admin")]
+    [Route("[area]/[controller]/[action]")]
     public class InvoiceController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -72,20 +74,6 @@ namespace HospitalInventoryManagement.Web.Areas.Invoice.Controllers
             return View(invoice);
         }
 
-        //Fatura Detayları
-        public async Task<IActionResult> Details(int id)
-        {
-            var invoice = await _context.Invoices
-                .Include(f => f.Cari)
-                .FirstOrDefaultAsync(f => f.Id == id);
-
-            if (invoice == null)
-            {
-                return NotFound();
-            }
-            return View(invoice);
-        }
-
         // Fatura Silme
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
@@ -103,52 +91,93 @@ namespace HospitalInventoryManagement.Web.Areas.Invoice.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> EditInvoice(int id, int month, int year)
+        public async Task<IActionResult> EditInvoice(int cariId, int month, int year)
         {
-            
-            var invoice = await _context.Invoices
-                .FirstOrDefaultAsync(i => i.CariId == id && i.Ay == month && i.Donemi == year);
-            Console.WriteLine($"cariId: {id}, month: {month}, year: {year}");
-            if (invoice == null)
+            try
             {
-                return NotFound();
-            }
+                var invoice = await _context.Invoices
+                    .FirstOrDefaultAsync(i => i.CariId == cariId && i.Ay == month && i.Donemi == year);
 
-            return View(invoice);
+                if (invoice == null)
+                {
+                    TempData["ErrorMessage"] = "Fatura bulunamadı.";
+                    return RedirectToAction("Index");
+                }
+
+                var cari = await _context.Cariler
+                    .FirstOrDefaultAsync(c => c.Id == cariId);
+
+                if (cari == null)
+                {
+                    TempData["ErrorMessage"] = "Cari bulunamadı.";
+                    return RedirectToAction("Index");
+                }
+
+                var viewModel = new EditInvoiceViewModel
+                {
+                    FaturaId = invoice.Id,
+                    CariId = cari.Id,
+                    CariAdi = cari.Unvan,
+                    Ay = invoice.Ay,
+                    Yil = invoice.Donemi,
+                    Tutar = invoice.Tutar,
+                    Ekler = invoice.Ekler
+                };
+
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Bir hata oluştu: {ex.Message}";
+                return RedirectToAction("Index");
+            }
         }
 
 
         [HttpPost]
-        public async Task<IActionResult> EditInvoice(Invoices updatedInvoice)
+        public async Task<IActionResult> EditInvoice(EditInvoiceViewModel model)
         {
-            if (ModelState.IsValid)
+            try
             {
-                try
+                // Cari Adı validasyondan kaldırılıyor
+                ModelState.Remove("CariAdi");
+
+                if (ModelState.IsValid)
                 {
-                    var invoice = await _context.Invoices.FindAsync(updatedInvoice.Id);
+                    var invoice = await _context.Invoices.FindAsync(model.FaturaId);
 
                     if (invoice == null)
                     {
-                        return NotFound();
+                        TempData["ErrorMessage"] = "Fatura bulunamadı.";
+                        return RedirectToAction("Index");
                     }
+                    Console.WriteLine($"Model Tutar: {model.Tutar}"); 
+                    Console.WriteLine($"Invoice Tutar (before update): {invoice.Tutar}");
 
-                    invoice.Tutar = updatedInvoice.Tutar;
-                    invoice.KapanisTarihi = updatedInvoice.KapanisTarihi;
-                    invoice.Ekler = updatedInvoice.Ekler;
+                    var cultureInfo = new System.Globalization.CultureInfo("tr-TR");
+                    invoice.Tutar = decimal.Parse(model.Tutar.ToString(cultureInfo), cultureInfo);
+                    Console.WriteLine($"Invoice Tutar (after update): {invoice.Tutar}");
+                    // Ekler alanı için boşluk kontrolü
+                    invoice.Ekler = string.IsNullOrWhiteSpace(model.Ekler) ? null : model.Ekler;
 
+                    // Veriyi güncelle ve kaydet
                     _context.Invoices.Update(invoice);
                     await _context.SaveChangesAsync();
 
                     TempData["SuccessMessage"] = "Fatura başarıyla güncellendi.";
-                    return RedirectToAction("Details", new { id = invoice.CariId, year = invoice.Donemi });
+                    return RedirectToAction("Details", "Cari", new { id = model.CariId, year = model.Yil });
                 }
-                catch (Exception ex)
+                else
                 {
-                    ModelState.AddModelError("", $"Bir hata oluştu: {ex.Message}");
+                    TempData["ErrorMessage"] = "Geçersiz form girişleri.";
                 }
             }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"Bir hata oluştu: {ex.Message}");
+            }
 
-            return View(updatedInvoice);
+            return View(model);
         }
 
         [HttpGet]

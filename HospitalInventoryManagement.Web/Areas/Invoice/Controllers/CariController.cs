@@ -80,12 +80,13 @@ namespace HospitalInventoryManagement.Web.Areas.Invoice.Controllers
                     AyIndex = month,
                     AyAdi = new[]
                     {
-                "Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran",
-                "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"
+                        "Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran",
+                        "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"
                     }[month - 1],
                     Tutar = invoicesForSelectedYear.FirstOrDefault(f => f.Ay == month)?.Tutar,
                     FaturaVarMi = invoicesForSelectedYear.Any(f => f.Ay == month),
-                    FaturaId = invoicesForSelectedYear.FirstOrDefault(f => f.Ay == month)?.Id
+                    FaturaId = invoicesForSelectedYear.FirstOrDefault(f => f.Ay == month)?.Id,
+                    CariId = id // CariId'yi her nesneye ekliyoruz
                 }).ToList();
 
             // ViewModel'i View'e aktar

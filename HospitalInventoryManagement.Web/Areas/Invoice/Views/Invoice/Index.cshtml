@@ -38,7 +38,6 @@
 
                     <td>@invoice.Ekler</td>
                     <td>
-                        <a onclick="window.location.href='/Invoice/Invoice/Details/@invoice.Id';" class="btn btn-info btn-sm">Detay</a>
                         <form asp-action="Delete" asp-route-id="@invoice.Id" method="post" class="d-inline">
                             <button type="submit" class="btn btn-danger btn-sm">Sil</button>
                         </form>
