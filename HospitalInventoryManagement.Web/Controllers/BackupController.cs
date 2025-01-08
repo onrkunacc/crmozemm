@@ -34,12 +34,12 @@ namespace HospitalInventoryManagement.Web.Controllers
                     Directory.CreateDirectory(backupFolderPath);
                 }
 
-                var backupFilePath = $"{backupFolderPath}\\HospitalInventoryBackup_{DateTime.Now:yyyyMMdd_HHmmss}.bak";
+                var backupFilePath = $"{backupFolderPath}\\crmozembackup_{DateTime.Now:yyyyMMdd}.bak";
 
                 using (var connection = new SqlConnection(connectionString))
                 {
                     var commandText = $@"
-                    BACKUP DATABASE [HospitalInventoryDb]
+                    BACKUP DATABASE [crmozemm2_]
                     TO DISK = '{backupFilePath}'
                     WITH INIT, STATS = 10";
 

@@ -1,0 +1,62 @@
+﻿@model IEnumerable<HospitalInventoryManagement.Web.Areas.Invoice.Models.ViewModels.FileViewModel>
+@{
+    ViewData["Title"] = "Dosya Listeleme";
+    Layout = "~/Areas/Invoice/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4"> 
+    <h2>Ödeme Yazıları Dosya Listesi</h2>
+    <hr />
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+    <div class="mb-3">
+        <form asp-action="UploadFile" method="file" enctype="multipart/form-data">
+            <div class="row">
+                <div class="col-md-4">
+                    <input type="file" name="file" class="form-control"/>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-success">Dosya Yükle</button>
+                </div>
+                <input type="hidden" name="cariId" value="@ViewBag.CariId"/>
+                <input type="hidden" name="year" value="@ViewBag.Year"/>
+            </div>
+        </form>
+    </div>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Dosya Adı</th>
+                <th>İşlemler</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var file in Model){
+                <tr>
+                    <td>@file.FileName</td>
+                    <td>
+                        <a asp-action="DownloadFile"
+                           asp-route-cariId="@ViewBag.CariId"
+                           asp-route-year="@ViewBag.Year"
+                           asp-route-fileName="@file.FileName"
+                           class="btn btn-primary btn-sm"
+                        >İndir</a>
+                        <a asp-action="UpdateFileView"
+                           asp-route-cariId="@ViewBag.CariId"
+                           asp-route-year="@ViewBag.Year"
+                           asp-route-fileName="@file.FileName"
+                        >Güncelle</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+

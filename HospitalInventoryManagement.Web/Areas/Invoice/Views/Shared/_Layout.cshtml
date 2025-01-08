@@ -56,6 +56,17 @@
 								<span class="hide-menu">Cari Ekle</span>
 							</a>
 						</li>
+
+						<li class="nav-small-cap">
+							<i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+							<span class="hide-menu">ÖDEME YAZILARI</span>
+						</li>
+						<li class="sidebar-item">
+							<a class="sidebar-link" href="@Url.Action("Index","InvoiceFile",new {area = "Invoice"})" aria-expanded="false">
+								<span><i class="ti ti-list"></i></span>
+								<span class="hide-menu">Ödeme Yazıları</span>
+							</a>
+						</li>
 						@if (User.IsInRole("Admin"))
 						{
 							<li class="sidebar-item">
@@ -65,6 +76,7 @@
 								</a>
 							</li>
 						}
+				
 					</ul>
 				</nav>
 			</div>
