@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using DocumentFormat.OpenXml.Packaging;
 using HospitalInventoryManagement.Web.Areas.Invoice.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using HospitalInventoryManagement.Data.Context;
+using Microsoft.EntityFrameworkCore;
 
 namespace YourProject.Areas.Invoice.Controllers
 {
@@ -13,10 +15,30 @@ namespace YourProject.Areas.Invoice.Controllers
     public class InvoiceFileController : Controller
     {
         private readonly string _baseFilePath = @"C:\Temp\OdemeYazilari";
+        private readonly ApplicationDbContext _context;
+
+        public InvoiceFileController(ApplicationDbContext context)
+        {
+                _context = context;
+        }
 
         // Dosya Listeleme
-        public IActionResult Index(int cariId, int year)
+        public async Task<IActionResult> Index(int? cariId, int? year)
         {
+            // Cariler ve yıllar için ViewBag doldur
+            ViewBag.Cariler = await _context.Cariler
+                .Select(c => new CariViewModel { Id = c.Id, Unvan = c.Unvan })
+                .ToListAsync();
+
+            ViewBag.Years = Enumerable.Range(DateTime.Now.Year - 10, 10).ToList();
+
+            // Varsayılan olarak cariId veya year belirtilmediyse dosyaları listeleme
+            if (!cariId.HasValue || !year.HasValue)
+            {
+                return View(new List<FileViewModel>());
+            }
+
+            // Dosyaları getir
             var cariFolder = Path.Combine(_baseFilePath, $"Cari{cariId}", year.ToString());
             if (!Directory.Exists(cariFolder))
             {
@@ -24,28 +46,40 @@ namespace YourProject.Areas.Invoice.Controllers
             }
 
             var files = Directory.GetFiles(cariFolder);
-            var fileModels = new List<FileViewModel>();
-
-            foreach (var file in files)
+            var fileModels = files.Select(file => new FileViewModel
             {
-                fileModels.Add(new FileViewModel
-                {
-                    FileName = Path.GetFileName(file),
-                    FilePath = file
-                });
-            }
+                FileName = Path.GetFileName(file),
+                FilePath = file
+            }).ToList();
 
             return View(fileModels);
         }
 
-        // Dosya Yükleme
+        [HttpGet]
+        public async Task<IActionResult> UploadFile()
+        {
+            ViewBag.Cariler = await _context.Cariler
+                     .Select(c => new CariViewModel { Id = c.Id, Unvan = c.Unvan })
+                     .ToListAsync();
+
+            ViewBag.Years = Enumerable.Range(DateTime.Now.Year - 5, 10).ToList();
+
+            return View();
+        }
         [HttpPost]
         public async Task<IActionResult> UploadFile(IFormFile file, int cariId, int year)
         {
+            var cari = await _context.Cariler.FindAsync(cariId);
+            if (cari == null)
+            {
+                TempData["ErrorMessage"] = "Geçersiz cari seçimi.";
+                return RedirectToAction("UploadFile");
+            }
+
             if (file == null || file.Length == 0)
             {
                 TempData["ErrorMessage"] = "Geçersiz dosya.";
-                return RedirectToAction("Index");
+                return RedirectToAction("UploadFile");
             }
 
             var folderPath = Path.Combine(_baseFilePath, $"Cari{cariId}", year.ToString());
@@ -75,6 +109,17 @@ namespace YourProject.Areas.Invoice.Controllers
             return File(fileBytes, "application/octet-stream", fileName);
         }
 
+        [HttpGet]
+        public IActionResult UpdateFileView(int cariId, int year, string fileName)
+        {
+            var model = new UpdateFileViewModel
+            {
+                CariId = cariId,
+                Year = year,
+                FileName = fileName
+            };
+            return View(model);
+        }
         // Dosya Güncelleme (Parametre Değişikliği)
         [HttpPost]
         public IActionResult UpdateFile(int cariId, int year, string fileName, Dictionary<string, string> parameters)
@@ -101,5 +146,47 @@ namespace YourProject.Areas.Invoice.Controllers
             TempData["SuccessMessage"] = "Dosya başarıyla güncellendi.";
             return RedirectToAction("Index", new { cariId, year });
         }
+        public IActionResult AllFiles()
+        {
+            var allFilesModel = new List<DirectoryViewModel>();
+
+            var cariDirectories = Directory.GetDirectories(_baseFilePath);
+            foreach (var cariDir in cariDirectories)
+            {
+                var cariId = Path.GetFileName(cariDir).Replace("Cari", "");
+                var cari = _context.Cariler.FirstOrDefault(c => c.Id.ToString() == cariId);
+
+                var yearFolders = Directory.GetDirectories(cariDir);
+                var yearModels = new List<YearFolderViewModel>();
+
+                foreach (var yearFolder in yearFolders)
+                {
+                    var year = Path.GetFileName(yearFolder);
+                    var files = Directory.GetFiles(yearFolder);
+
+                    var fileModels = files.Select(file => new FileViewModel
+                    {
+                        FileName = Path.GetFileName(file),
+                        FilePath = file
+                    }).ToList();
+
+                    yearModels.Add(new YearFolderViewModel
+                    {
+                        Year = int.Parse(year),
+                        Files = fileModels
+                    });
+                }
+
+                allFilesModel.Add(new DirectoryViewModel
+                {
+                    CariId = int.Parse(cariId),
+                    CariName = cari?.Unvan ?? $"Cari {cariId}", // Cari adı varsa kullan, yoksa fallback
+                    YearFolders = yearModels
+                });
+            }
+
+            return View(allFilesModel);
+        }
+
     }
 }

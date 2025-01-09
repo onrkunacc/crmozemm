@@ -1,0 +1,78 @@
+﻿@model IEnumerable<HospitalInventoryManagement.Web.Areas.Invoice.Models.ViewModels.DirectoryViewModel>
+@{
+    ViewData["Title"] = "Ödeme Yazıları";
+    Layout = "~/Areas/Invoice/Views/Shared/_Layout.cshtml";
+}
+<style>
+    .card {
+        min-height: 150px; /* Kartın sabit yüksekliği */
+    }
+
+    .card-body {
+        overflow-y: auto; /* Scroll yapılabilir */
+    }
+
+    .text-truncate {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis; /* Uzun dosya adlarını kes */
+    }
+
+    .btn i {
+        margin-right: 5px;
+        font-size: 14px; /* İkon boyutu */
+    }
+
+    .btn {
+        padding: 5px 8px; /* Buton içeriği düzenleme */
+    }
+</style>
+<div class="container mt-4">
+    <h2 class="text-center">Tüm Ödeme Yazıları</h2>
+    <hr />
+
+    <div class="row">
+        @foreach (var directory in Model)
+        {
+            <div class="col-md-3 mb-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header text-center">
+                        <h5 class="card-title">@directory.CariName</h5>
+                    </div>
+                    <div class="card-body p-2" style="height: 300px; overflow-y: auto;">
+                        @foreach (var yearFolder in directory.YearFolders)
+                        {
+                            <h6 class="text-muted">@yearFolder.Year</h6>
+                            <ul class="list-unstyled">
+                                @foreach (var file in yearFolder.Files)
+                                {
+                                    <li class="mb-3">
+                                        <div class="d-flex justify-content-between">
+                                            <span class="text-truncate" style="max-width: 150px;">@file.FileName</span>
+                                            <div class="btn-group">
+                                                <a asp-action="DownloadFile"
+                                                   asp-route-cariId="@directory.CariId"
+                                                   asp-route-year="@yearFolder.Year"
+                                                   asp-route-fileName="@file.FileName"
+                                                   class="btn btn-sm btn-primary">
+                                                    <i class="fas fa-download"></i> <!-- İndirme İkonu -->
+                                                </a>
+                                                <a asp-action="UpdateFileView"
+                                                   asp-route-cariId="@directory.CariId"
+                                                   asp-route-year="@yearFolder.Year"
+                                                   asp-route-fileName="@file.FileName"
+                                                   class="btn btn-sm btn-secondary">
+                                                    <i class="fas fa-edit"></i> <!-- Düzenleme İkonu -->
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

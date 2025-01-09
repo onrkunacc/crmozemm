@@ -62,9 +62,21 @@
 							<span class="hide-menu">ÖDEME YAZILARI</span>
 						</li>
 						<li class="sidebar-item">
-							<a class="sidebar-link" href="@Url.Action("Index","InvoiceFile",new {area = "Invoice"})" aria-expanded="false">
+							<a class="sidebar-link" href="@Url.Action("AllFiles","InvoiceFile",new {area = "Invoice"})" aria-expanded="false">
 								<span><i class="ti ti-list"></i></span>
 								<span class="hide-menu">Ödeme Yazıları</span>
+							</a>
+						</li>
+						<li class="sidebar-item">
+							<a class="sidebar-link" href="@Url.Action("Index","InvoiceFile",new {area = "Invoice"})" aria-expanded="false">
+								<span><i class="ti ti-list"></i></span>
+								<span class="hide-menu">Ödeme Yazıları Filtrele</span>
+							</a>
+						</li>
+						<li class="sidebar-item">
+							<a class="sidebar-link" href="@Url.Action("UploadFile","InvoiceFile",new {area = "Invoice"})" aria-expanded="false">
+								<span><i class="ti ti-upload"></i></span>
+								<span class="hide-menu">Ödeme Yazısı Yükle</span>
 							</a>
 						</li>
 						@if (User.IsInRole("Admin"))
