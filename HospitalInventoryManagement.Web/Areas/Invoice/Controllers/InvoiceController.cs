@@ -49,6 +49,22 @@ namespace HospitalInventoryManagement.Web.Areas.Invoice.Controllers
                 invoice.Tutar = decimal.Parse(invoice.Tutar.ToString(cultureInfo), cultureInfo);
                 ModelState.Remove(nameof(invoice.Cari));
 
+                var existingInvoice = await _context.Invoices
+                    .FirstOrDefaultAsync(i => i.CariId == invoice.CariId && i.Ay == invoice.Ay && i.Donemi == invoice.Donemi);
+
+                if (existingInvoice != null)
+                {
+                    TempData["ErrorMessage"] = $"Seçilen ayda ({invoice.Ay}/{invoice.Donemi}) bu cariye ait zaten bir fatura var. " +
+                                                $"Fatura No: {existingInvoice.Id}, Tutar: {existingInvoice.Tutar.ToString("N2", cultureInfo)}.";
+
+                    // Cariler tekrar yüklenir
+                    ViewBag.Cariler = await _context.Cariler
+                        .Select(c => new { c.Id, c.Unvan })
+                        .ToListAsync();
+
+                    return View(invoice);
+                }
+
                 // Validasyon kontrolü
                 if (ModelState.IsValid)
                 {
@@ -191,6 +207,6 @@ namespace HospitalInventoryManagement.Web.Areas.Invoice.Controllers
             ViewBag.SelectedYear = year;
             return View("Index", invoices);
         }
-
+        
     }
 }

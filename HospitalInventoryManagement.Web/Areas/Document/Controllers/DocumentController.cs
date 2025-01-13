@@ -107,7 +107,6 @@ namespace HospitalInventoryManagement.Web.Areas.Document.Controllers
             return View(document);
         }
 
-
-
+       
     }
 }

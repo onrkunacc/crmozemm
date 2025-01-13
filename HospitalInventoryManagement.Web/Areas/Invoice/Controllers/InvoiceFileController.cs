@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 namespace YourProject.Areas.Invoice.Controllers
 {
     [Area("Invoice")]
-    [Authorize(Roles = "Admin, InvoiceManager")]
+    [Authorize(Roles = "Admin,InvoiceRole")]
     public class InvoiceFileController : Controller
     {
         private readonly string _baseFilePath = @"C:\Temp\OdemeYazilari";

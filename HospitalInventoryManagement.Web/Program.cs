@@ -88,6 +88,7 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseMiddleware<ExceptionMiddleware>();
 
+
 // Kimlik doğrulama ve yetkilendirme middleware'lerini ekle
 app.UseAuthentication();
 app.UseAuthorization();

@@ -118,34 +118,37 @@ namespace HospitalInventoryManagement.Web.Controllers
 
             try
             {
-                var product = _context.Products.FirstOrDefault(p => p.ProductID == viewModel.ProductID);
-                // Ürün seçimine göre `ReferenceNumber`'ı otomatik olarak alıyoruz
-                var referenceNumber = _context.Products
-                                             .Where(p => p.ProductID == viewModel.ProductID)
-                                             .Select(p => p.ReferenceNumber)
-                                             .FirstOrDefault();
+                var existingStock = _context.Stocks.FirstOrDefault(s =>
+                        s.ProductID == viewModel.ProductID &&
+                        s.LotNumber == viewModel.LotNumber &&
+                        s.HospitalID == user.HospitalID);
 
-                if (string.IsNullOrEmpty(referenceNumber))
+                if (existingStock != null)
                 {
-                    ModelState.AddModelError("", "Ürüne ait referans numarası bulunamadı.");
-                    viewModel.Products = new SelectList(_context.Products, "ProductID", "ProductName");
-                    return View(viewModel);
+                    // Mevcut stok güncellemesi
+                    existingStock.Quantity += viewModel.Quantity;
+                    existingStock.ExpiryDate = viewModel.ExpirationDate;
+                    existingStock.LastUpdated = DateTime.Now;
+
+                    _context.Stocks.Update(existingStock);
+                }
+                else
+                {
+                    // Yeni stok oluşturma
+                    var stock = new Stock
+                    {
+                        ProductID = viewModel.ProductID,
+                        HospitalID = user.HospitalID,
+                        Quantity = viewModel.Quantity,
+                        LotNumber = viewModel.LotNumber,
+                        ExpiryDate = viewModel.ExpirationDate,
+                        LastUpdated = DateTime.Now
+                    };
+
+                    _context.Stocks.Add(stock);
                 }
 
-                // Yeni stok kaydı oluşturuyoruz
-                var stock = new Stock
-                {
-                    ProductID = viewModel.ProductID,
-                    HospitalID = user.HospitalID,
-                    ExpiryDate = viewModel.ExpirationDate,
-                    Quantity = viewModel.Quantity,
-                    LotNumber = viewModel.LotNumber,
-                    LastUpdated = DateTime.Now,
-                    FlaconCount = product.FlaconCountPerBox
-                };
-
-                // Stok ekleme işlemi
-                _stockService.AddStock(stock);
+                _context.SaveChanges();
                 TempData["SuccessMessage"] = "Stok girişi başarılı bir şekilde yapıldı.";
                 return RedirectToAction("Index");
             }
@@ -279,7 +282,14 @@ namespace HospitalInventoryManagement.Web.Controllers
                 ? _stockService.GetAllStocks()
                 : _stockService.GetStocksByHospital(user.HospitalID);
 
-            ViewBag.Stocks = new SelectList(stocks, "StockID", "Product.ProductName");
+            var stockSelectList = stocks.Select(s => new
+            {
+                StockID = s.StockID,
+                DisplayText = $"{s.Product.ProductName} - Lot: {s.LotNumber}"
+            }).ToList();
+
+            ViewBag.Stocks = new SelectList(stockSelectList, "StockID", "DisplayText");
+
             return View();
         }
 
@@ -373,7 +383,6 @@ namespace HospitalInventoryManagement.Web.Controllers
             {
                 return RedirectToAction("AccessDenied", "Account");
             }
-
             if (!ModelState.IsValid)
             {
                 return View(viewModel);
@@ -381,31 +390,31 @@ namespace HospitalInventoryManagement.Web.Controllers
 
             try
             {
-
-                var stock = _stockService.GetStockByReferenceNumber(viewModel.ReferenceNumber, user.HospitalID);
-
-                if (stock != null)
+                var product = _context.Products.FirstOrDefault(p => p.ReferenceNumber == viewModel.ReferenceNumber);
+                if (product == null)
                 {
-                    stock.Quantity += viewModel.Quantity;
-                    stock.LotNumber = viewModel.LotNumber;
-                    stock.ExpiryDate = viewModel.ExpiryDate;
-                    stock.LastUpdated = DateTime.Now;
-                    if (stock.FlaconCount == 0)
-                    {
-                        var product = _context.Products.FirstOrDefault(p => p.ProductID == stock.ProductID);
-                        stock.FlaconCount = product?.FlaconCountPerBox ?? 0;
-                    }
-                    _context.SaveChanges();
+                    ModelState.AddModelError("", "Ürün bulunamadı. Lütfen geçerli bir referans numarası girin.");
+                    return View(viewModel);
+                }
+
+                // Aynı ProductID ve LotNumber olup olmadığını kontrol et
+                var existingStock = _context.Stocks.FirstOrDefault(s =>
+                    s.ProductID == product.ProductID &&
+                    s.LotNumber == viewModel.LotNumber &&
+                    s.HospitalID == user.HospitalID);
+
+                if (existingStock != null)
+                {
+                    // Mevcut stoğu güncelle
+                    existingStock.Quantity += viewModel.Quantity;
+                    existingStock.ExpiryDate = viewModel.ExpiryDate;
+                    existingStock.LastUpdated = DateTime.Now;
+
+                    _context.Stocks.Update(existingStock);
                 }
                 else
                 {
-                    var product = _context.Products.FirstOrDefault(p => p.ReferenceNumber == viewModel.ReferenceNumber);
-                    if (product == null)
-                    {
-                        ModelState.AddModelError("", "Ürün bulunamadı. Lütfen geçerli bir referans numarası girin.");
-                        return View(viewModel);
-                    }
-
+                    // Yeni stok oluştur
                     var newStock = new Stock
                     {
                         ProductID = product.ProductID,
@@ -418,8 +427,10 @@ namespace HospitalInventoryManagement.Web.Controllers
                     };
 
                     _context.Stocks.Add(newStock);
-                    _context.SaveChanges();
                 }
+
+                // Değişiklikleri kaydet
+                _context.SaveChanges();
 
                 TempData["SuccessMessage"] = "Stok girişi başarılı bir şekilde yapıldı.";
                 return RedirectToAction("BarcodeStockEntry");
