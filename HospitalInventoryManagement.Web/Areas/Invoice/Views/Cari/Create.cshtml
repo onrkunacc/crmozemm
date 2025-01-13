@@ -1,4 +1,4 @@
-﻿@model HospitalInventoryManagement.Data.Models.Cariler
+﻿@model HospitalInventoryManagement.Web.Areas.Invoice.Models.ViewModels.CariCreateViewModel
 
 @{
     ViewData["Title"] = "Yeni Cari Ekle";
@@ -10,50 +10,54 @@
 
     <form asp-action="Create" method="post">
         <div class="mb-3">
-            <label asp-for="CariKodu" class="form-label">Cari Kodu</label>
-            <input asp-for="CariKodu" class="form-control" />
-            <span asp-validation-for="CariKodu" class="text-danger"></span>
+            <label asp-for="Cari.CariKodu" class="form-label">Cari Kodu</label>
+            <input asp-for="Cari.CariKodu" class="form-control" />
+            <span asp-validation-for="Cari.CariKodu" class="text-danger"></span>
         </div>
         <div class="mb-3">
-            <label asp-for="Unvan" class="form-label">Unvan</label>
-            <input asp-for="Unvan" class="form-control" />
-            <span asp-validation-for="Unvan" class="text-danger"></span>
+            <label asp-for="Cari.Unvan" class="form-label">Unvan</label>
+            <input asp-for="Cari.Unvan" class="form-control" />
+            <span asp-validation-for="Cari.Unvan" class="text-danger"></span>
         </div>
         <div class="mb-3">
-            <label for="CariGrubuId" class="form-label">Cari Grubu:</label>
-            <select asp-for="CariGrubuId" class="form-control" asp-items="ViewBag.CariGruplari"></select>
-            <span asp-validation-for="CariGrubuId" class="text-danger"></span>
+            <label for="Cari.CariGrubuId" class="form-label">Cari Grubu:</label>
+            <select id="CariGrubuId" name="Cari.CariGrubuId" class="form-control">
+                <option value="">Seçiniz</option>
+                @foreach (var grup in Model.CariGruplari)
+                {
+                    <option value="@grup.Value">@grup.Text</option>
+                }
+            </select>
         </div>
         <div class="mb-3">
-            <label asp-for="TeklifNo" class="form-label">Teklif No</label>
-            <input asp-for="TeklifNo" class="form-control" />
-            <span asp-validation-for="TeklifNo" class="text-danger"></span>
+            <label asp-for="Cari.TeklifNo" class="form-label">Teklif No</label>
+            <input asp-for="Cari.TeklifNo" class="form-control" />
+            <span asp-validation-for="Cari.TeklifNo" class="text-danger"></span>
         </div>
         <div class="mb-3">
-            <label asp-for="IhaleNo" class="form-label">İhale No</label>
-            <input asp-for="IhaleNo" class="form-control" />
-            <span asp-validation-for="IhaleNo" class="text-danger"></span>
+            <label asp-for="Cari.IhaleNo" class="form-label">İhale No</label>
+            <input asp-for="Cari.IhaleNo" class="form-control" />
+            <span asp-validation-for="Cari.IhaleNo" class="text-danger"></span>
         </div>
         <div class="mb-3">
-            <label asp-for="Tevkifat" class="form-label">Tevkifat</label>
-            <select asp-for="Tevkifat" class="form-control">
+            <label asp-for="Cari.Tevkifat" class="form-label">Tevkifat</label>
+            <select asp-for="Cari.Tevkifat" class="form-control">
                 <option value="true">Evet</option>
                 <option value="false">Hayır</option>
             </select>
-            <span asp-validation-for="Tevkifat" class="text-danger"></span>
+            <span asp-validation-for="Cari.Tevkifat" class="text-danger"></span>
         </div>
         <div class="mb-3">
-            <label asp-for="Il" class="form-label">İl</label>
-            <input asp-for="Il" class="form-control"/>
-            <span asp-validation-for="Il" class="text-danger"></span>
+            <label asp-for="Cari.Il" class="form-label">İl</label>
+            <input asp-for="Cari.Il" class="form-control" />
+            <span asp-validation-for="Cari.Il" class="text-danger"></span>
         </div>
         <div class="mb-3">
-            <label asp-for="Ilce" class="form-label">İlçe</label>
-            <input asp-for="Ilce" class="form-control" />
-            <span asp-validation-for="Ilce" class="text-danger"></span>
+            <label asp-for="Cari.Ilce" class="form-label">İlçe</label>
+            <input asp-for="Cari.Ilce" class="form-control" />
+            <span asp-validation-for="Cari.Ilce" class="text-danger"></span>
         </div>
         <button type="submit" class="btn btn-success">Kaydet</button>
         <a asp-action="Index" class="btn btn-secondary">İptal</a>
     </form>
 </div>
-

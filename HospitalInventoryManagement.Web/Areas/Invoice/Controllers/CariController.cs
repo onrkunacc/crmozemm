@@ -25,33 +25,49 @@ namespace HospitalInventoryManagement.Web.Areas.Invoice.Controllers
             var cariler = await _context.Cariler.Include(c => c.CariGrubu).ToListAsync();
             return View(cariler);
         }
-
-        // Yeni Cari Ekleme (Form Görünümü)
         public IActionResult Create()
         {
-            ViewBag.CariGruplari = new SelectList(_context.CariGruplari, "Id", "GrupAdi");
-            return View(new Cariler());
+            var cariGruplari = _context.CariGruplari
+                .Select(cg => new SelectListItem
+                {
+                    Value = cg.Id.ToString(),
+                    Text = cg.GrupAdi
+                }).ToList();
+
+            var viewModel = new CariCreateViewModel
+            {
+                Cari = new Cariler(),
+                CariGruplari = cariGruplari
+            };
+
+            Console.WriteLine($"CariGrupları Yüklendi: {cariGruplari.Count}"); // Debug için
+            return View(viewModel);
         }
 
         // Yeni Cari Ekleme (Post İşlemi)
         [HttpPost]
-        public async Task<IActionResult> Create(Cariler cari)
+        public async Task<IActionResult> Create(CariCreateViewModel viewModel)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                _context.Cariler.Add(cari);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                viewModel.CariGruplari = _context.CariGruplari
+                    .Select(cg => new SelectListItem
+                    {
+                        Value = cg.Id.ToString(),
+                        Text = cg.GrupAdi
+                    }).ToList();
+
+                return View(viewModel);
             }
 
-            ViewBag.CariGruplari = _context.CariGruplari.ToList();
-            return View(cari);
+            _context.Cariler.Add(viewModel.Cari);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Cari başarıyla eklendi.";
+            return RedirectToAction(nameof(Index));
         }
 
-        // Cari Detayları
-        //Cari İşlemlerini 12 aylık fatura takibini devam ettiriyorum.Son işlemler .
         [Area("Invoice")]
-        //[Route("[area]/[controller]/[action]/{id?}")]
         [HttpGet]
         public async Task<IActionResult> Details(int id, int? year)
         {
