@@ -36,11 +36,10 @@ namespace HospitalInventoryManagement.Web.Areas.Invoice.Controllers
 
             var viewModel = new CariCreateViewModel
             {
-                Cari = new Cariler(),
                 CariGruplari = cariGruplari
             };
 
-            Console.WriteLine($"CariGrupları Yüklendi: {cariGruplari.Count}"); // Debug için
+            Console.WriteLine($"CariGrupları Yüklendi: {cariGruplari.Count}");
             return View(viewModel);
         }
 
@@ -48,8 +47,12 @@ namespace HospitalInventoryManagement.Web.Areas.Invoice.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CariCreateViewModel viewModel)
         {
+            ModelState.Remove("CariGruplari");
+            ModelState.Remove("Cari.Invoices");
+
             if (!ModelState.IsValid)
             {
+                // Dropdown'ın yeniden yüklenmesi
                 viewModel.CariGruplari = _context.CariGruplari
                     .Select(cg => new SelectListItem
                     {
@@ -57,9 +60,16 @@ namespace HospitalInventoryManagement.Web.Areas.Invoice.Controllers
                         Text = cg.GrupAdi
                     }).ToList();
 
+                Console.WriteLine("ModelState Hataları:");
+                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    Console.WriteLine($"Error: {error.ErrorMessage}");
+                }
+
                 return View(viewModel);
             }
 
+            // Yeni cari ekleme
             _context.Cariler.Add(viewModel.Cari);
             await _context.SaveChangesAsync();
 
