@@ -32,6 +32,9 @@ namespace YourProject.Areas.Invoice.Controllers
 
             ViewBag.Years = Enumerable.Range(DateTime.Now.Year - 10, 10).ToList();
 
+            ViewBag.SelectedCariId = cariId;
+            ViewBag.SelectedYear = year;
+
             // Varsayılan olarak cariId veya year belirtilmediyse dosyaları listeleme
             if (!cariId.HasValue || !year.HasValue)
             {
@@ -112,19 +115,35 @@ namespace YourProject.Areas.Invoice.Controllers
         [HttpGet]
         public IActionResult UpdateFileView(int cariId, int year, string fileName)
         {
+            var filePath = Path.Combine(_baseFilePath, $"Cari{cariId}", year.ToString(), fileName);
+
+            if (!System.IO.File.Exists(filePath))
+            {
+                return NotFound("Dosya bulunamadı.");
+            }
+
+            string fileContent;
+            using (var wordDoc = WordprocessingDocument.Open(filePath, false))
+            {
+                var body = wordDoc.MainDocumentPart.Document.Body;
+                fileContent = body.InnerXml; // Word içeriği HTML/XML formatında alınır
+            }
+
             var model = new UpdateFileViewModel
             {
                 CariId = cariId,
                 Year = year,
-                FileName = fileName
+                FileName = fileName,
+                FileContent = fileContent // HTML olarak frontend'e gönderilir
             };
+
             return View(model);
         }
-        // Dosya Güncelleme (Parametre Değişikliği)
+
         [HttpPost]
-        public IActionResult UpdateFile(int cariId, int year, string fileName, Dictionary<string, string> parameters)
+        public IActionResult UpdateFile(UpdateFileViewModel model)
         {
-            var filePath = Path.Combine(_baseFilePath, $"Cari{cariId}", year.ToString(), fileName);
+            var filePath = Path.Combine(_baseFilePath, $"Cari{model.CariId}", model.Year.ToString(), model.FileName);
 
             if (!System.IO.File.Exists(filePath))
             {
@@ -133,19 +152,15 @@ namespace YourProject.Areas.Invoice.Controllers
 
             using (var wordDoc = WordprocessingDocument.Open(filePath, true))
             {
-
                 var body = wordDoc.MainDocumentPart.Document.Body;
-                foreach (var parameter in parameters)
-                {
-                    body.InnerXml = body.InnerXml.Replace($"{{{parameter.Key}}}", parameter.Value);
-                }
-
+                body.InnerXml = model.FileContent; // Kullanıcıdan gelen düzenlenmiş içerik dosyaya yazılır
                 wordDoc.MainDocumentPart.Document.Save();
             }
 
             TempData["SuccessMessage"] = "Dosya başarıyla güncellendi.";
-            return RedirectToAction("Index", new { cariId, year });
+            return RedirectToAction("Index", new { cariId = model.CariId, year = model.Year });
         }
+
         public IActionResult AllFiles()
         {
             var allFilesModel = new List<DirectoryViewModel>();

@@ -61,16 +61,25 @@
                 <tr>
                     <td>@file.FileName</td>
                     <td>
-                        <a asp-action="DownloadFile"
-                           asp-route-cariId="@ViewBag.CariId"
-                           asp-route-year="@ViewBag.Year"
+                        <!-- İndir -->
+                        <a asp-area="Invoice"
+                           asp-action="DownloadFile"
+                           asp-route-cariId="@ViewBag.SelectedCariId"
+                           asp-route-year="@ViewBag.SelectedYear"
                            asp-route-fileName="@file.FileName"
-                           class="btn btn-primary btn-sm">İndir</a>
-                        <a asp-action="UpdateFileView"
-                           asp-route-cariId="@ViewBag.CariId"
-                           asp-route-year="@ViewBag.Year"
+                           class="btn btn-primary btn-sm">
+                            İndir
+                        </a>
+
+                        <!-- Güncelle -->
+                        <a asp-area="Invoice"
+                           asp-action="UpdateFileView"
+                           asp-route-cariId="@ViewBag.SelectedCariId"
+                           asp-route-year="@ViewBag.SelectedYear"
                            asp-route-fileName="@file.FileName"
-                           class="btn btn-secondary btn-sm">Güncelle</a>
+                           class="btn btn-secondary btn-sm">
+                            Güncelle
+                        </a>
                     </td>
                 </tr>
             }
@@ -78,3 +87,17 @@
     </table>
 </div>
 
+<script>
+        function redirectToAction(actionUrl, cariId, year, fileName) {
+        if (!cariId || !year || !fileName) {
+            alert("Lütfen tüm seçimleri yapın.");
+            return;
+        }
+
+        // Dinamik URL oluşturma (area bilgisi eklendi)
+        const url = `/Invoice${actionUrl}?cariId=${cariId}&year=${year}&fileName=${encodeURIComponent(fileName)}`;
+
+        // Yönlendirme
+        window.location.href = url;
+    }
+</script>

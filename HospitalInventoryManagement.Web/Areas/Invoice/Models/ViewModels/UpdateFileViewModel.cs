@@ -5,6 +5,6 @@
         public int CariId { get; set; }
         public int Year { get; set; }
         public string FileName { get; set; }
-        public Dictionary<string,string> Parameters { get; set; }
+        public string FileContent { get; set; }
     }
 }

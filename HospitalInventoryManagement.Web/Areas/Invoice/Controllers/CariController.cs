@@ -36,23 +36,34 @@ namespace HospitalInventoryManagement.Web.Areas.Invoice.Controllers
 
             var viewModel = new CariCreateViewModel
             {
+                Cari = new Cariler(),
                 CariGruplari = cariGruplari
             };
 
-            Console.WriteLine($"CariGrupları Yüklendi: {cariGruplari.Count}");
             return View(viewModel);
         }
+
 
         // Yeni Cari Ekleme (Post İşlemi)
         [HttpPost]
         public async Task<IActionResult> Create(CariCreateViewModel viewModel)
         {
+            Console.WriteLine($"Gelen CariGrubuId: {viewModel.Cari.CariGrubuId}");
+
+            // ModelState'ten bu alanları kaldır
             ModelState.Remove("CariGruplari");
             ModelState.Remove("Cari.Invoices");
+            ModelState.Remove("Cari.CariGrubu");
 
             if (!ModelState.IsValid)
             {
-                // Dropdown'ın yeniden yüklenmesi
+                Console.WriteLine("ModelState Hataları:");
+                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    Console.WriteLine($"Error: {error.ErrorMessage}");
+                }
+
+                // View'e yeniden doldurulabilir alanları ekle
                 viewModel.CariGruplari = _context.CariGruplari
                     .Select(cg => new SelectListItem
                     {
@@ -60,22 +71,17 @@ namespace HospitalInventoryManagement.Web.Areas.Invoice.Controllers
                         Text = cg.GrupAdi
                     }).ToList();
 
-                Console.WriteLine("ModelState Hataları:");
-                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
-                {
-                    Console.WriteLine($"Error: {error.ErrorMessage}");
-                }
-
                 return View(viewModel);
             }
 
-            // Yeni cari ekleme
+            // Cari ekleme işlemi
             _context.Cariler.Add(viewModel.Cari);
             await _context.SaveChangesAsync();
 
             TempData["SuccessMessage"] = "Cari başarıyla eklendi.";
             return RedirectToAction(nameof(Index));
         }
+
 
         [Area("Invoice")]
         [HttpGet]

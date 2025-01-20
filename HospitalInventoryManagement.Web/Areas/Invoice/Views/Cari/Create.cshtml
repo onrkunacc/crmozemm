@@ -4,7 +4,15 @@
     ViewData["Title"] = "Yeni Cari Ekle";
     Layout = "~/Areas/Invoice/Views/Shared/_Layout.cshtml";
 }
+<style>
+    .form-check {
+        margin-bottom: 10px;
+    }
 
+    .form-check-input {
+        margin-right: 10px;
+    }
+</style>
 <div class="container mt-4">
     <h2>Yeni Cari Ekle</h2>
 
@@ -20,16 +28,22 @@
             <span asp-validation-for="Cari.Unvan" class="text-danger"></span>
         </div>
         <div class="mb-3">
-            <label for="Cari.CariGrubuId" class="form-label">Cari Grubu:</label>
-            <select id="Cari.CariGrubuId" name="Cari.CariGrubuId" class="form-control">
-                <option value="">Seçiniz</option>
+            <label class="form-label">Cari Grubu:</label>
+            <div>
                 @foreach (var grup in Model.CariGruplari)
                 {
-                    <option value="@grup.Value" @(Model.Cari.CariGrubuId == int.Parse(grup.Value) ? "selected" : "")>
-                        @grup.Text
-                    </option>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio"
+                               id="CariGrubu_@grup.Value"
+                               name="Cari.CariGrubuId"
+                               value="@grup.Value"
+                        @(Model.Cari.CariGrubuId == int.Parse(grup.Value) ? "checked" : "") />
+                        <label class="form-check-label" for="CariGrubu_@grup.Value">
+                            @grup.Text
+                        </label>
+                    </div>
                 }
-            </select>
+            </div>
             <span asp-validation-for="Cari.CariGrubuId" class="text-danger"></span>
         </div>
         <div class="mb-3">

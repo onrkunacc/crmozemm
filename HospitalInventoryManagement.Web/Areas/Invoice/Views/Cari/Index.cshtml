@@ -16,6 +16,7 @@
                     <th>Cari Kodu</th>
                     <th>Unvan</th>
                     <th>Cari Grubu</th>
+                    <th>Tevkifat</th>
                     <th>İl</th>
                     <th>İlçe</th>
                     <th>İşlemler</th>
@@ -28,6 +29,7 @@
                         <td class="fw-bold">@cari.CariKodu</td>
                         <td>@cari.Unvan</td>
                         <td>@cari.CariGrubu?.GrupAdi</td>
+                        <td>@(cari.Tevkifat ? "Evet" : "Hayır")</td>
                         <td>@cari.Il</td>
                         <td>@cari.Ilce</td>
                         <td>

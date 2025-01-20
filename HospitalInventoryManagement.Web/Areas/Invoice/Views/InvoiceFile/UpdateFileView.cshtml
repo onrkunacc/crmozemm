@@ -1,0 +1,24 @@
+﻿@model UpdateFileViewModel
+@{
+    ViewData["Title"] = "Düzelt";
+    Layout = "~/Areas/Invoice/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <h2>Dosya Güncelleme: @Model.FileName</h2>
+
+    <form asp-action="UpdateFile" method="post">
+        <input type="hidden" asp-for="CariId" />
+        <input type="hidden" asp-for="Year" />
+        <input type="hidden" asp-for="FileName" />
+
+        <div class="mb-3">
+            <label for="FileContent" class="form-label">Dosya İçeriği:</label>
+            <textarea id="FileContent" name="FileContent" class="form-control" rows="20">@Html.Raw(Model.FileContent)</textarea>
+        </div>
+
+        <button type="submit" class="btn btn-success">Kaydet</button>
+        <a asp-action="Index" class="btn btn-secondary">İptal</a>
+    </form>
+</div>
+
