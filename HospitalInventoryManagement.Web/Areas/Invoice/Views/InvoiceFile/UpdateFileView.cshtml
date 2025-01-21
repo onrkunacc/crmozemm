@@ -1,24 +1,39 @@
 ﻿@model UpdateFileViewModel
 @{
-    ViewData["Title"] = "Düzelt";
-    Layout = "~/Areas/Invoice/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = $"Dosya Güncelle - {Model.FileName}";
 }
 
 <div class="container mt-4">
-    <h2>Dosya Güncelleme: @Model.FileName</h2>
-
+    <h2>Dosya Güncelle: @Model.FileName</h2>
+    <hr />
     <form asp-action="UpdateFile" method="post">
         <input type="hidden" asp-for="CariId" />
         <input type="hidden" asp-for="Year" />
         <input type="hidden" asp-for="FileName" />
-
-        <div class="mb-3">
-            <label for="FileContent" class="form-label">Dosya İçeriği:</label>
-            <textarea id="FileContent" name="FileContent" class="form-control" rows="20">@Html.Raw(Model.FileContent)</textarea>
+        <div class="form-group">
+            <label for="FileContent">Dosya İçeriği</label>
+            <!-- Summernote ile bağlanan textarea -->
+            <textarea id="summernote" asp-for="FileContent" class="form-control">@Html.Raw(Model.FileContent)</textarea>
         </div>
-
-        <button type="submit" class="btn btn-success">Kaydet</button>
-        <a asp-action="Index" class="btn btn-secondary">İptal</a>
+        <button type="submit" class="btn btn-success mt-3">Kaydet</button>
+        <a asp-action="Index" class="btn btn-secondary mt-3">Geri Dön</a>
     </form>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">
+
+<script>
+    $(document).ready(function () {
+        $('#editor').summernote({
+            height: 400,
+            toolbar: [
+                ['style', ['bold', 'italic', 'underline', 'clear']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['table', ['table']],
+                ['view', ['fullscreen', 'codeview', 'help']]
+            ]
+        });
+    });
+</script>
 

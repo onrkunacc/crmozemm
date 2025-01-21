@@ -7,6 +7,9 @@ using HospitalInventoryManagement.Web.Areas.Invoice.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using HospitalInventoryManagement.Data.Context;
 using Microsoft.EntityFrameworkCore;
+using Xceed.Words.NET;
+using DocumentFormat.OpenXml.Wordprocessing;
+using System.Text;
 
 namespace YourProject.Areas.Invoice.Controllers
 {
@@ -102,10 +105,21 @@ namespace YourProject.Areas.Invoice.Controllers
         // Dosya İndirme
         public IActionResult DownloadFile(int cariId, int year, string fileName)
         {
+            // Parametrelerin loglanması
+            Console.WriteLine($"Gelen Parametreler - CariId: {cariId}, Year: {year}, FileName: {fileName}");
+
+            if (cariId == 0 || year == 0 || string.IsNullOrEmpty(fileName))
+            {
+                Console.WriteLine("Parametrelerden biri eksik!");
+                return NotFound(new { Message = "Geçersiz parametreler." });
+            }
+
             var filePath = Path.Combine(_baseFilePath, $"Cari{cariId}", year.ToString(), fileName);
+
             if (!System.IO.File.Exists(filePath))
             {
-                return NotFound("Dosya bulunamadı.");
+                Console.WriteLine($"Dosya bulunamadı: {filePath}");
+                return NotFound(new { Message = "Dosya bulunamadı." });
             }
 
             var fileBytes = System.IO.File.ReadAllBytes(filePath);
@@ -119,14 +133,26 @@ namespace YourProject.Areas.Invoice.Controllers
 
             if (!System.IO.File.Exists(filePath))
             {
-                return NotFound("Dosya bulunamadı.");
+                Console.WriteLine($"Dosya bulunamadı: {filePath}");
+                return NotFound(new { Message = "Dosya bulunamadı." });
             }
 
-            string fileContent;
-            using (var wordDoc = WordprocessingDocument.Open(filePath, false))
+            string htmlContent;
+
+            try
             {
-                var body = wordDoc.MainDocumentPart.Document.Body;
-                fileContent = body.InnerXml; // Word içeriği HTML/XML formatında alınır
+                using (var wordDoc = WordprocessingDocument.Open(filePath, false))
+                {
+                    var body = wordDoc.MainDocumentPart.Document.Body;
+
+                    // Daha iyi HTML formatı oluştur
+                    htmlContent = ConvertWordToFormattedHtml(body);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Hata: {ex.Message}");
+                return StatusCode(500, "Dosya yükleme sırasında hata oluştu.");
             }
 
             var model = new UpdateFileViewModel
@@ -134,11 +160,60 @@ namespace YourProject.Areas.Invoice.Controllers
                 CariId = cariId,
                 Year = year,
                 FileName = fileName,
-                FileContent = fileContent // HTML olarak frontend'e gönderilir
+                FileContent = htmlContent
             };
 
             return View(model);
         }
+
+        private string ConvertWordToFormattedHtml(Body body)
+        {
+            var htmlBuilder = new StringBuilder();
+
+            foreach (var paragraph in body.Elements<Paragraph>())
+            {
+                // Varsayılan olarak sola hizala
+                string paragraphStyle = "text-align: left;";
+
+                var alignmentValue = paragraph.ParagraphProperties?.Justification?.Val;
+
+                if (alignmentValue != null)
+                {
+                    if (alignmentValue.Value == JustificationValues.Center)
+                    {
+                        paragraphStyle = "text-align: center;";
+                    }
+                    else if (alignmentValue.Value == JustificationValues.Right)
+                    {
+                        paragraphStyle = "text-align: right;";
+                    }
+                }
+
+                htmlBuilder.Append($"<p style='{paragraphStyle}'>");
+
+                foreach (var run in paragraph.Elements<Run>())
+                {
+                    var bold = run.RunProperties?.Bold != null ? "font-weight: bold;" : "";
+                    var italic = run.RunProperties?.Italic != null ? "font-style: italic;" : "";
+                    var fontSize = run.RunProperties?.FontSize?.Val != null
+                        ? $"font-size: {run.RunProperties.FontSize.Val}px;"
+                        : "";
+
+                    var textStyle = $"{bold} {italic} {fontSize}";
+
+                    foreach (var text in run.Elements<Text>())
+                    {
+                        htmlBuilder.Append($"<span style='{textStyle}'>{text.Text}</span>");
+                    }
+                }
+
+                htmlBuilder.Append("</p>");
+            }
+
+            return htmlBuilder.ToString();
+        }
+
+
 
         [HttpPost]
         public IActionResult UpdateFile(UpdateFileViewModel model)
@@ -147,19 +222,39 @@ namespace YourProject.Areas.Invoice.Controllers
 
             if (!System.IO.File.Exists(filePath))
             {
-                return NotFound("Dosya bulunamadı.");
+                Console.WriteLine($"Dosya bulunamadı: {filePath}");
+                return NotFound(new { Message = "Dosya bulunamadı." });
             }
 
-            using (var wordDoc = WordprocessingDocument.Open(filePath, true))
+            try
             {
-                var body = wordDoc.MainDocumentPart.Document.Body;
-                body.InnerXml = model.FileContent; // Kullanıcıdan gelen düzenlenmiş içerik dosyaya yazılır
-                wordDoc.MainDocumentPart.Document.Save();
+                using (var doc = DocX.Load(filePath))
+                {
+                    // Mevcut paragrafları temizle
+                    var paragraphs = doc.Paragraphs.ToList();
+                    foreach (var paragraph in paragraphs)
+                    {
+                        doc.RemoveParagraph(paragraph);
+                    }
+
+                    // Summernote HTML içeriğini yeni paragraflar olarak ekle
+                    doc.InsertParagraph(model.FileContent);
+
+                    // Dosyayı kaydet
+                    doc.Save();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Hata: {ex.Message}");
+                return StatusCode(500, "Dosya güncelleme sırasında hata oluştu.");
             }
 
             TempData["SuccessMessage"] = "Dosya başarıyla güncellendi.";
             return RedirectToAction("Index", new { cariId = model.CariId, year = model.Year });
         }
+
+
 
         public IActionResult AllFiles()
         {
@@ -176,32 +271,54 @@ namespace YourProject.Areas.Invoice.Controllers
 
                 foreach (var yearFolder in yearFolders)
                 {
-                    var year = Path.GetFileName(yearFolder);
-                    var files = Directory.GetFiles(yearFolder);
+                    var folderName = Path.GetFileName(yearFolder);
 
-                    var fileModels = files.Select(file => new FileViewModel
-                    {
-                        FileName = Path.GetFileName(file),
-                        FilePath = file
-                    }).ToList();
+                    // Hatalı klasörleri logla
+                    Console.WriteLine($"Klasör adı kontrol ediliyor: {folderName}");
 
-                    yearModels.Add(new YearFolderViewModel
+                    // Yalnızca yıl formatındaki klasörleri dahil et
+                    if (int.TryParse(folderName, out var year) && year >= 1900 && year <= 2100)
                     {
-                        Year = int.Parse(year),
-                        Files = fileModels
-                    });
+                        Console.WriteLine($"Geçerli yıl klasörü bulundu: {folderName}");
+
+                        var files = Directory.GetFiles(yearFolder);
+                        var fileModels = files.Select(file => new FileViewModel
+                        {
+                            FileName = Path.GetFileName(file),
+                            FilePath = file
+                        }).ToList();
+
+                        yearModels.Add(new YearFolderViewModel
+                        {
+                            Year = year,
+                            Files = fileModels
+                        });
+                    }
+                    else
+                    {
+                        // Geçersiz klasörlerin loglanması
+                        Console.WriteLine($"Geçersiz klasör bulundu: {folderName}");
+                    }
                 }
 
-                allFilesModel.Add(new DirectoryViewModel
+                if (int.TryParse(cariId, out var parsedCariId))
                 {
-                    CariId = int.Parse(cariId),
-                    CariName = cari?.Unvan ?? $"Cari {cariId}", // Cari adı varsa kullan, yoksa fallback
-                    YearFolders = yearModels
-                });
+                    allFilesModel.Add(new DirectoryViewModel
+                    {
+                        CariId = parsedCariId,
+                        CariName = cari?.Unvan ?? $"Cari {cariId}",
+                        YearFolders = yearModels
+                    });
+                }
+                else
+                {
+                    Console.WriteLine($"Geçersiz Cari ID: {cariId}");
+                }
             }
 
             return View(allFilesModel);
         }
+
 
     }
 }

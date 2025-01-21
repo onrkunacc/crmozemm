@@ -63,6 +63,7 @@
                     <td>
                         <!-- İndir -->
                         <a asp-area="Invoice"
+                           asp-controller="InvoiceFile"
                            asp-action="DownloadFile"
                            asp-route-cariId="@ViewBag.SelectedCariId"
                            asp-route-year="@ViewBag.SelectedYear"
@@ -73,6 +74,7 @@
 
                         <!-- Güncelle -->
                         <a asp-area="Invoice"
+                           asp-controller="InvoiceFile"
                            asp-action="UpdateFileView"
                            asp-route-cariId="@ViewBag.SelectedCariId"
                            asp-route-year="@ViewBag.SelectedYear"
@@ -86,18 +88,3 @@
         </tbody>
     </table>
 </div>
-
-<script>
-        function redirectToAction(actionUrl, cariId, year, fileName) {
-        if (!cariId || !year || !fileName) {
-            alert("Lütfen tüm seçimleri yapın.");
-            return;
-        }
-
-        // Dinamik URL oluşturma (area bilgisi eklendi)
-        const url = `/Invoice${actionUrl}?cariId=${cariId}&year=${year}&fileName=${encodeURIComponent(fileName)}`;
-
-        // Yönlendirme
-        window.location.href = url;
-    }
-</script>
