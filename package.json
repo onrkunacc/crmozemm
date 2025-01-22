@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "@ckeditor/ckeditor5-build-classic": "^44.1.0"
+  },
+  "devDependencies": {
+    "webpack": "^5.97.1",
+    "webpack-cli": "^6.0.1"
+  }
+}

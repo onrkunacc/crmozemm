@@ -145,7 +145,7 @@ namespace YourProject.Areas.Invoice.Controllers
                 {
                     var body = wordDoc.MainDocumentPart.Document.Body;
 
-                    // Daha iyi HTML formatı oluştur
+                    // Word dosyasını düzenlenebilir HTML'ye çevir
                     htmlContent = ConvertWordToFormattedHtml(body);
                 }
             }
@@ -170,48 +170,121 @@ namespace YourProject.Areas.Invoice.Controllers
         {
             var htmlBuilder = new StringBuilder();
 
-            foreach (var paragraph in body.Elements<Paragraph>())
+            foreach (var element in body.ChildElements)
             {
-                // Varsayılan olarak sola hizala
-                string paragraphStyle = "text-align: left;";
-
-                var alignmentValue = paragraph.ParagraphProperties?.Justification?.Val;
-
-                if (alignmentValue != null)
+                if (element is Paragraph paragraphElement)
                 {
-                    if (alignmentValue.Value == JustificationValues.Center)
+                    string paragraphStyle = "text-align: left;";
+
+                    var alignmentValue = paragraphElement.ParagraphProperties?.Justification?.Val;
+                    if (alignmentValue != null)
                     {
-                        paragraphStyle = "text-align: center;";
+                        if (alignmentValue.Value == JustificationValues.Center)
+                        {
+                            paragraphStyle = "text-align: center;";
+                        }
+                        else if (alignmentValue.Value == JustificationValues.Right)
+                        {
+                            paragraphStyle = "text-align: right;";
+                        }
+                        else
+                        {
+                            paragraphStyle = "text-align: left;";
+                        }
                     }
-                    else if (alignmentValue.Value == JustificationValues.Right)
+
+                    htmlBuilder.Append($"<p style='{paragraphStyle}'>");
+
+                    foreach (var run in paragraphElement.Elements<Run>())
                     {
-                        paragraphStyle = "text-align: right;";
+                        var bold = run.RunProperties?.Bold != null ? "font-weight: bold;" : "";
+                        var italic = run.RunProperties?.Italic != null ? "font-style: italic;" : "";
+                        var fontSize = run.RunProperties?.FontSize?.Val != null
+                            ? $"font-size: {run.RunProperties.FontSize.Val}px;"
+                            : "";
+
+                        var textStyle = $"{bold} {italic} {fontSize}";
+
+                        foreach (var text in run.Elements<Text>())
+                        {
+                            htmlBuilder.Append($"<span style='{textStyle}'>{text.Text}</span>");
+                        }
                     }
+
+                    htmlBuilder.Append("</p>");
                 }
-
-                htmlBuilder.Append($"<p style='{paragraphStyle}'>");
-
-                foreach (var run in paragraph.Elements<Run>())
+                else if (element is Table tableElement)
                 {
-                    var bold = run.RunProperties?.Bold != null ? "font-weight: bold;" : "";
-                    var italic = run.RunProperties?.Italic != null ? "font-style: italic;" : "";
-                    var fontSize = run.RunProperties?.FontSize?.Val != null
-                        ? $"font-size: {run.RunProperties.FontSize.Val}px;"
-                        : "";
+                    htmlBuilder.Append("<table style='border-collapse: collapse; width: 100%;'>");
 
-                    var textStyle = $"{bold} {italic} {fontSize}";
-
-                    foreach (var text in run.Elements<Text>())
+                    foreach (var row in tableElement.Elements<TableRow>())
                     {
-                        htmlBuilder.Append($"<span style='{textStyle}'>{text.Text}</span>");
-                    }
-                }
+                        htmlBuilder.Append("<tr>");
 
-                htmlBuilder.Append("</p>");
+                        foreach (var cell in row.Elements<TableCell>())
+                        {
+                            string cellStyle = "border: 1px solid black; padding: 5px;";
+
+                            var firstParagraph = cell.Elements<Paragraph>().FirstOrDefault();
+                            if (firstParagraph?.ParagraphProperties?.Justification?.Val != null)
+                            {
+                                var cellAlignment = firstParagraph.ParagraphProperties.Justification.Val;
+
+                                if (cellAlignment == JustificationValues.Center)
+                                {
+                                    cellStyle += "text-align: center;";
+                                }
+                                else if (cellAlignment == JustificationValues.Right)
+                                {
+                                    cellStyle += "text-align: right;";
+                                }
+                                else
+                                {
+                                    cellStyle += "text-align: left;";
+                                }
+                            }
+
+                            htmlBuilder.Append($"<td style='{cellStyle}'>");
+
+                            foreach (var cellParagraph in cell.Elements<Paragraph>())
+                            {
+                                htmlBuilder.Append("<p>");
+
+                                foreach (var run in cellParagraph.Elements<Run>())
+                                {
+                                    var bold = run.RunProperties?.Bold != null ? "font-weight: bold;" : "";
+                                    var italic = run.RunProperties?.Italic != null ? "font-style: italic;" : "";
+                                    var fontSize = run.RunProperties?.FontSize?.Val != null
+                                        ? $"font-size: {run.RunProperties.FontSize.Val}px;"
+                                        : "";
+
+                                    var textStyle = $"{bold} {italic} {fontSize}";
+
+                                    foreach (var text in run.Elements<Text>())
+                                    {
+                                        htmlBuilder.Append($"<span style='{textStyle}'>{text.Text}</span>");
+                                    }
+                                }
+
+                                htmlBuilder.Append("</p>");
+                            }
+
+                            htmlBuilder.Append("</td>");
+                        }
+
+                        htmlBuilder.Append("</tr>");
+                    }
+
+                    htmlBuilder.Append("</table>");
+                }
             }
 
             return htmlBuilder.ToString();
         }
+
+
+
+
 
 
 
@@ -228,20 +301,22 @@ namespace YourProject.Areas.Invoice.Controllers
 
             try
             {
-                using (var doc = DocX.Load(filePath))
+                using (var wordDoc = WordprocessingDocument.Open(filePath, true))
                 {
-                    // Mevcut paragrafları temizle
-                    var paragraphs = doc.Paragraphs.ToList();
+                    var body = wordDoc.MainDocumentPart.Document.Body;
+
+                    // Mevcut içeriği temizle
+                    body.RemoveAllChildren();
+
+                    // CKEditor’den gelen HTML’yi ekle
+                    var paragraphs = model.FileContent.Split(new[] { "<p>", "</p>" }, StringSplitOptions.RemoveEmptyEntries);
                     foreach (var paragraph in paragraphs)
                     {
-                        doc.RemoveParagraph(paragraph);
+                        var p = new Paragraph(new Run(new Text(paragraph.Trim())));
+                        body.AppendChild(p);
                     }
 
-                    // Summernote HTML içeriğini yeni paragraflar olarak ekle
-                    doc.InsertParagraph(model.FileContent);
-
-                    // Dosyayı kaydet
-                    doc.Save();
+                    wordDoc.MainDocumentPart.Document.Save();
                 }
             }
             catch (Exception ex)
