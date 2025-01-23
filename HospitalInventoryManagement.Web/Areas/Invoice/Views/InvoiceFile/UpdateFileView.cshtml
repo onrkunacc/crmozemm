@@ -1,45 +1,49 @@
 ﻿@model UpdateFileViewModel
 @{
-    ViewData["Title"] = $"Dosya Güncelle - {Model.FileName}";
+	ViewData["Title"] = $"Dosya Güncelle - {Model.FileName}";
 }
-<style>
-    .main-container {
-        width: 795px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-</style>
 <div class="container mt-4">
-    <h2>Dosya Güncelle: @Model.FileName</h2>
-    <hr />
-    <form asp-action="UpdateFile" method="post">
-        <input type="hidden" asp-for="CariId" />
-        <input type="hidden" asp-for="Year" />
-        <input type="hidden" asp-for="FileName" />
-        <div class="main-container">
-            <label for="FileContent">Dosya İçeriği</label>
-            <textarea id="editor" asp-for="FileContent" class="form-control">@Html.Raw(Model.FileContent)</textarea>
-        </div>
-        <button type="submit" class="btn btn-success mt-3">Kaydet</button>
-        <a asp-action="Index" class="btn btn-secondary mt-3">Geri Dön</a>
-    </form>
+	<h2>Dosya Güncelle: @Model.FileName</h2>
+	<hr />
+	<form asp-action="UpdateFile" method="post">
+		<input type="hidden" asp-for="CariId" />
+		<input type="hidden" asp-for="Year" />
+		<input type="hidden" asp-for="FileName" />
+		<input type="hidden" id="file-content" name="FileContent" />
+		<div id="editor-container" style="height: 700px; border: 1px solid #ccc;"></div>
+		<button type="submit" class="btn btn-success mt-3" onclick="syncContent()">Kaydet</button>
+		<a asp-action="Index" class="btn btn-secondary mt-3">Geri Dön</a>
+	</form>
 </div>
 
-<script src="https://cdn.ckeditor.com/ckeditor5/38.0.1/classic/ckeditor.js"></script>
-
+<!-- Quill and CSS -->
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
 
 <script>
-    ClassicEditor
-        .create(document.querySelector('#editor'), {
-            toolbar: [
-                'bold', 'italic', 'underline', 'bulletedList', 'numberedList', 
-                'alignment', 'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor'
-            ]
-        })
-        .then(editor => {
-            console.log('CKEditor başarıyla yüklendi.');
-        })
-        .catch(error => {
-            console.error('CKEditor yükleme hatası:', error);
-        });
+	
+	var initialContent = `@Html.Raw(Model.FileContent ?? "")`;
+
+	var quill = new Quill('#editor-container', {
+		theme: 'snow',
+		modules: {
+			toolbar: [
+				[{ 'header': [1, 2, false] }],
+				['bold', 'italic', 'underline'],
+				[{ 'list': 'ordered'}, { 'list': 'bullet' }],
+				[{ 'align': [] }], // Hizalama araçları
+				['clean'], // Temizle
+				['table'] // Tablo (Better Table eklentisi gerekiyorsa eklenebilir)
+			]
+		}
+	});
+
+	
+	quill.clipboard.dangerouslyPasteHTML(initialContent);
+
+	
+	function syncContent() {
+		var content = quill.root.innerHTML;
+		document.getElementById('file-content').value = content;
+	}
 </script>

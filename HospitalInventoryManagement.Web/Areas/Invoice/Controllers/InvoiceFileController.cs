@@ -166,127 +166,7 @@ namespace YourProject.Areas.Invoice.Controllers
             return View(model);
         }
 
-        private string ConvertWordToFormattedHtml(Body body)
-        {
-            var htmlBuilder = new StringBuilder();
-
-            foreach (var element in body.ChildElements)
-            {
-                if (element is Paragraph paragraphElement)
-                {
-                    string paragraphStyle = "text-align: left;";
-
-                    var alignmentValue = paragraphElement.ParagraphProperties?.Justification?.Val;
-                    if (alignmentValue != null)
-                    {
-                        if (alignmentValue.Value == JustificationValues.Center)
-                        {
-                            paragraphStyle = "text-align: center;";
-                        }
-                        else if (alignmentValue.Value == JustificationValues.Right)
-                        {
-                            paragraphStyle = "text-align: right;";
-                        }
-                        else
-                        {
-                            paragraphStyle = "text-align: left;";
-                        }
-                    }
-
-                    htmlBuilder.Append($"<p style='{paragraphStyle}'>");
-
-                    foreach (var run in paragraphElement.Elements<Run>())
-                    {
-                        var bold = run.RunProperties?.Bold != null ? "font-weight: bold;" : "";
-                        var italic = run.RunProperties?.Italic != null ? "font-style: italic;" : "";
-                        var fontSize = run.RunProperties?.FontSize?.Val != null
-                            ? $"font-size: {run.RunProperties.FontSize.Val}px;"
-                            : "";
-
-                        var textStyle = $"{bold} {italic} {fontSize}";
-
-                        foreach (var text in run.Elements<Text>())
-                        {
-                            htmlBuilder.Append($"<span style='{textStyle}'>{text.Text}</span>");
-                        }
-                    }
-
-                    htmlBuilder.Append("</p>");
-                }
-                else if (element is Table tableElement)
-                {
-                    htmlBuilder.Append("<table style='border-collapse: collapse; width: 100%;'>");
-
-                    foreach (var row in tableElement.Elements<TableRow>())
-                    {
-                        htmlBuilder.Append("<tr>");
-
-                        foreach (var cell in row.Elements<TableCell>())
-                        {
-                            string cellStyle = "border: 1px solid black; padding: 5px;";
-
-                            var firstParagraph = cell.Elements<Paragraph>().FirstOrDefault();
-                            if (firstParagraph?.ParagraphProperties?.Justification?.Val != null)
-                            {
-                                var cellAlignment = firstParagraph.ParagraphProperties.Justification.Val;
-
-                                if (cellAlignment == JustificationValues.Center)
-                                {
-                                    cellStyle += "text-align: center;";
-                                }
-                                else if (cellAlignment == JustificationValues.Right)
-                                {
-                                    cellStyle += "text-align: right;";
-                                }
-                                else
-                                {
-                                    cellStyle += "text-align: left;";
-                                }
-                            }
-
-                            htmlBuilder.Append($"<td style='{cellStyle}'>");
-
-                            foreach (var cellParagraph in cell.Elements<Paragraph>())
-                            {
-                                htmlBuilder.Append("<p>");
-
-                                foreach (var run in cellParagraph.Elements<Run>())
-                                {
-                                    var bold = run.RunProperties?.Bold != null ? "font-weight: bold;" : "";
-                                    var italic = run.RunProperties?.Italic != null ? "font-style: italic;" : "";
-                                    var fontSize = run.RunProperties?.FontSize?.Val != null
-                                        ? $"font-size: {run.RunProperties.FontSize.Val}px;"
-                                        : "";
-
-                                    var textStyle = $"{bold} {italic} {fontSize}";
-
-                                    foreach (var text in run.Elements<Text>())
-                                    {
-                                        htmlBuilder.Append($"<span style='{textStyle}'>{text.Text}</span>");
-                                    }
-                                }
-
-                                htmlBuilder.Append("</p>");
-                            }
-
-                            htmlBuilder.Append("</td>");
-                        }
-
-                        htmlBuilder.Append("</tr>");
-                    }
-
-                    htmlBuilder.Append("</table>");
-                }
-            }
-
-            return htmlBuilder.ToString();
-        }
-
-
-
-
-
-
+        
 
         [HttpPost]
         public IActionResult UpdateFile(UpdateFileViewModel model)
@@ -394,6 +274,160 @@ namespace YourProject.Areas.Invoice.Controllers
             return View(allFilesModel);
         }
 
+        private string ConvertWordToFormattedHtml(Body body)
+        {
+            var htmlBuilder = new StringBuilder();
 
+            foreach (var element in body.ChildElements)
+            {
+                if (element is Paragraph paragraphElement)
+                {
+                    string paragraphStyle = "text-align: left;";
+
+                    // Paragraf hizalama
+                    var alignmentValue = paragraphElement.ParagraphProperties?.Justification?.Val;
+                    if (alignmentValue != null)
+                    {
+                        if (alignmentValue.Value == JustificationValues.Center)
+                        {
+                            paragraphStyle = "text-align: center;";
+                        }
+                        else if (alignmentValue.Value == JustificationValues.Right)
+                        {
+                            paragraphStyle = "text-align: right;";
+                        }
+                    }
+
+                    htmlBuilder.Append($"<p style='{paragraphStyle}'>");
+
+                    foreach (var run in paragraphElement.Elements<Run>())
+                    {
+                        var bold = run.RunProperties?.Bold != null ? "font-weight: bold;" : "";
+                        var italic = run.RunProperties?.Italic != null ? "font-style: italic;" : "";
+                        var fontSize = run.RunProperties?.FontSize?.Val != null
+                            ? $"font-size: {run.RunProperties.FontSize.Val}px;"
+                            : "";
+
+                        var textStyle = $"{bold} {italic} {fontSize}";
+
+                        foreach (var text in run.Elements<Text>())
+                        {
+                            htmlBuilder.Append($"<span style='{textStyle}'>{text.Text}</span>");
+                        }
+                    }
+
+                    htmlBuilder.Append("</p>");
+                }
+                else if (element is Table tableElement)
+                {
+                    htmlBuilder.Append("<table style='border-collapse: collapse; width: 50%; margin: 0 auto; border: 1px solid black;'>");
+
+                    foreach (var row in tableElement.Elements<TableRow>())
+                    {
+                        htmlBuilder.Append("<tr>");
+
+                        foreach (var cell in row.Elements<TableCell>())
+                        {
+                            string cellStyle = "border: 1px solid black; padding: 5px; text-align: left;";
+                            int colSpan = 1;
+                            int rowSpan = 1;
+
+                            // Sütun birleşimlerini kontrol et
+                            var gridSpan = cell.TableCellProperties?.GridSpan?.Val;
+                            if (gridSpan != null)
+                            {
+                                colSpan = int.Parse(gridSpan.InnerText);
+                            }
+
+                            // Satır birleşimlerini kontrol et
+                            var vMerge = cell.TableCellProperties?.VerticalMerge;
+                            if (vMerge != null && vMerge.Val != null)
+                            {
+                                if (vMerge.Val.Value == MergedCellValues.Restart)
+                                {
+                                    rowSpan = GetRowSpan(cell);
+                                }
+                                else if (vMerge.Val.Value == MergedCellValues.Continue)
+                                {
+                                    continue;
+                                }
+                            }
+
+                            // Hücreyi oluştur
+                            htmlBuilder.Append($"<td style='{cellStyle}' colspan='{colSpan}' rowspan='{rowSpan}'>");
+
+                            var combinedText = new StringBuilder();
+
+                            // Hücre içeriğini birleştir
+                            foreach (var cellParagraph in cell.Elements<Paragraph>())
+                            {
+                                foreach (var run in cellParagraph.Elements<Run>())
+                                {
+                                    foreach (var text in run.Elements<Text>())
+                                    {
+                                        combinedText.Append(text.Text.Trim() + " ");
+                                    }
+                                }
+                            }
+
+                            // Fatura Tarihi ve Numarası kontrolü
+                            var cellContent = combinedText.ToString().Trim();
+                            if (cellContent.Contains("Fatura Tarihi") || cellContent.Contains("Fatura Numarası"))
+                            {
+                                // Özel işlem gerekirse burada yapabilirsiniz
+                                cellContent = cellContent.Replace("Fatura Tarihi", "").Replace("Fatura Numarası", "").Trim();
+                            }
+
+                            htmlBuilder.Append(cellContent);
+                            htmlBuilder.Append("</td>");
+                        }
+
+                        htmlBuilder.Append("</tr>");
+                    }
+
+                    htmlBuilder.Append("</table>");
+                }
+            }
+
+            return htmlBuilder.ToString();
+        }
+
+        // Satır birleşimlerini çözümlemek için yardımcı metot
+        private int GetRowSpan(TableCell cell)
+        {
+            var rowSpan = 1;
+            var nextCell = cell;
+
+            while (nextCell != null)
+            {
+                var vMerge = nextCell.TableCellProperties?.VerticalMerge;
+                if (vMerge == null || vMerge.Val == null || vMerge.Val.Value != MergedCellValues.Continue)
+                {
+                    break;
+                }
+
+                rowSpan++;
+                nextCell = GetNextCellInRow(nextCell);
+            }
+
+            return rowSpan;
+        }
+
+        // Satırdaki bir sonraki hücreyi bulmak için bir yardımcı metot
+        private TableCell GetNextCellInRow(TableCell currentCell)
+        {
+            var row = currentCell.Ancestors<TableRow>().FirstOrDefault();
+            if (row == null) return null;
+
+            var cells = row.Elements<TableCell>().ToList();
+            var index = cells.IndexOf(currentCell);
+
+            if (index >= 0 && index < cells.Count - 1)
+            {
+                return cells[index + 1];
+            }
+
+            return null;
+        }
     }
 }
