@@ -4,7 +4,7 @@
     Layout = "~/Areas/Invoice/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container mt-4"> 
+<div class="container mt-4">
     <h2>Ödeme Yazıları Dosya Listesi</h2>
     <hr />
     @if (TempData["SuccessMessage"] != null)
@@ -73,14 +73,15 @@
                         </a>
 
                         <!-- Güncelle -->
-                        <a asp-area="Invoice"
-                           asp-controller="InvoiceFile"
-                           asp-action="UpdateFileView"
-                           asp-route-cariId="@ViewBag.SelectedCariId"
-                           asp-route-year="@ViewBag.SelectedYear"
-                           asp-route-fileName="@file.FileName"
+                        <a href="@Url.Action("UpdateFileView", "InvoiceFile", new { area = "Invoice", cariId = ViewBag.SelectedCariId, year = ViewBag.SelectedYear, fileName = file.FileName })"
                            class="btn btn-secondary btn-sm">
                             Güncelle
+                        </a>
+
+                        <a href="@Url.Action("PrintFile", "InvoiceFile", new { area = "Invoice", cariId = ViewBag.SelectedCariId, year = ViewBag.SelectedYear, fileName = file.FileName })"
+                           target="_blank"
+                           class="btn btn-info btn-sm">
+                            Yazdır
                         </a>
                     </td>
                 </tr>

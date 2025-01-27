@@ -5,14 +5,15 @@
 <div class="container mt-4">
 	<h2>Dosya Güncelle: @Model.FileName</h2>
 	<hr />
-	<form asp-action="UpdateFile" method="post">
+	<form asp-action="UpdateFileView" asp-controller="InvoiceFile" asp-area="Invoice" method="post">
+		@Html.AntiForgeryToken()
 		<input type="hidden" asp-for="CariId" />
 		<input type="hidden" asp-for="Year" />
 		<input type="hidden" asp-for="FileName" />
 		<input type="hidden" id="file-content" name="FileContent" />
 		<div id="editor-container" style="height: 700px; border: 1px solid #ccc;"></div>
 		<button type="submit" class="btn btn-success mt-3" onclick="syncContent()">Kaydet</button>
-		<a asp-action="Index" class="btn btn-secondary mt-3">Geri Dön</a>
+		<a href="@Url.Action("AllFiles", "InvoiceFile", new { area = "Invoice", cariId = Model.CariId, year = Model.Year })" class="btn btn-secondary mt-3">Geri Dön</a>
 	</form>
 </div>
 
@@ -31,9 +32,9 @@
 				[{ 'header': [1, 2, false] }],
 				['bold', 'italic', 'underline'],
 				[{ 'list': 'ordered'}, { 'list': 'bullet' }],
-				[{ 'align': [] }], // Hizalama araçları
-				['clean'], // Temizle
-				['table'] // Tablo (Better Table eklentisi gerekiyorsa eklenebilir)
+				[{ 'align': [] }], 
+				['clean'], 
+				['table'] 
 			]
 		}
 	});

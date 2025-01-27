@@ -1,0 +1,23 @@
+﻿@model UpdateFileViewModel
+@{
+    ViewData["Title"] = "Yazdır";
+    Layout = "~/Areas/Invoice/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>@Model.FileName</title>
+</head>
+<body>
+    <div class="content-container">
+        @Html.Raw(Model.FileContent)
+    </div>
+    <script>
+        window.print();
+    </script>
+</body>
+</html>
+
+
