@@ -51,54 +51,11 @@
 		document.getElementById('file-content').value = content;
 	}
 
-    function printContent() {
-        
-        var content = quill.root.innerHTML;
-
-        
-        var iframe = document.createElement('iframe');
-        document.body.appendChild(iframe);
-
-        
-        iframe.style.position = 'absolute';
-        iframe.style.top = '-9999px';
-
-        
-        var doc = iframe.contentDocument || iframe.contentWindow.document;
-        doc.open();
-        doc.write(`
-            <html>
-            <head>
-                <title>Yazdır</title>
-                <style>
-                    body {
-                        font-family: Arial, sans-serif;
-                        margin: 20px;
-                        line-height: 1.6;
-                        font-size: 14px;
-                        color: #000;
-                    }
-                    .ql-editor {
-                        line-height: 1.6;
-                        font-size: 14px;
-                        color: #000;
-                    }
-                </style>
-            </head>
-            <body>
-                <div class="ql-editor">
-                    ${content} <!-- Quill içeriğini iframe içine koy -->
-                </div>
-            </body>
-            </html>
-        `);
-        doc.close();
-
-       
-        iframe.contentWindow.focus();
-        iframe.contentWindow.print();
-
-        
-        document.body.removeChild(iframe);
-    }
+	function printContent() {
+			printJS({
+				printable: 'editor-container',
+				type: 'html',
+				targetStyles: ['*']
+			});
+	}
 </script>
