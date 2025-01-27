@@ -23,9 +23,9 @@ namespace YourProject.Areas.Invoice.Controllers
         private readonly ApplicationDbContext _context;
         private readonly IFileProccesingService _fileProccesingService;
 
-        public InvoiceFileController(ApplicationDbContext context,IFileProccesingService fileProccesingService)
+        public InvoiceFileController(ApplicationDbContext context, IFileProccesingService fileProccesingService)
         {
-             _context = context;
+            _context = context;
             _fileProccesingService = fileProccesingService;
         }
 
@@ -89,10 +89,9 @@ namespace YourProject.Areas.Invoice.Controllers
         // Dosya İndirme
         public IActionResult DownloadFile(int cariId, int year, string fileName)
         {
-           
+
             if (cariId == 0 || year == 0 || string.IsNullOrEmpty(fileName))
             {
-                Console.WriteLine("Parametrelerden biri eksik!");
                 return NotFound(new { Message = "Geçersiz parametreler." });
             }
 
@@ -103,30 +102,37 @@ namespace YourProject.Areas.Invoice.Controllers
                 return NotFound(new { Message = "Dosya bulunamadı." });
             }
 
+            // Dosya indir
             var fileBytes = System.IO.File.ReadAllBytes(filePath);
-            return File(fileBytes, "application/octet-stream", fileName);
+            return File(fileBytes, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", fileName);
         }
 
         [HttpGet]
         public IActionResult UpdateFileView(int cariId, int year, string fileName)
         {
             var filePath = GetFilePath(cariId, year, fileName);
-            if (!System.IO.File.Exists(filePath))
-                return NotFound(new { Message = "Dosya bulunamadı." });
 
-            var htmlContent = _fileProccesingService.ConvertWordToFormattedHtml(filePath);
-            var model = new UpdateFileViewModel
+            try
             {
-                CariId = cariId,
-                Year = year,
-                FileName = fileName,
-                FileContent = htmlContent
-            };
+                var htmlContent = _fileProccesingService.ConvertWordToFormattedHtml(filePath);
+                var model = new UpdateFileViewModel
+                {
+                    CariId = cariId,
+                    Year = year,
+                    FileName = fileName,
+                    FileContent = htmlContent
+                };
 
-            return View(model);
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Hata: {ex.Message}");
+                return RedirectToAction("Error", "Home", new { area = "", message = ex.Message });
+            }
         }
 
-        
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -260,6 +266,6 @@ namespace YourProject.Areas.Invoice.Controllers
 
             return View("PrintFile", model);
         }
-       
+
     }
 }

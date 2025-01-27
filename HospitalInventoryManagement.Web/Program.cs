@@ -22,6 +22,8 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()  // Rollerle birli
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();  // Şifre sıfırlama ve e-posta doğrulama gibi işlemler için token sağlayıcı
 
+
+
 // Service ve Interface eklemeleri
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IStockService, StockService>();
@@ -31,18 +33,19 @@ builder.Services.AddScoped<IBarcodeService, BarcodeService>();
 builder.Services.AddScoped<IErrorLogService, ErrorLogService>();
 builder.Services.AddScoped<IFileProccesingService,FileProcessingService>();
 
+
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
         options.Cookie.Name = "auth-cookie";
         options.Cookie.HttpOnly = true;
         options.Cookie.IsEssential = true;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // HTTPS zorunlu
-        options.Cookie.SameSite = SameSiteMode.Lax; // Çapraz site cookie kullanýmý
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always; 
+        options.Cookie.SameSite = SameSiteMode.Lax; 
         options.LoginPath = "/Account/Login";
-        options.AccessDeniedPath = "/Account/AccessDenied"; // Yetkisiz eriþim
-        options.ExpireTimeSpan = TimeSpan.FromDays(7); // Cookie süresi
-        options.SlidingExpiration = true; // Kullanýcý aktifken süreyi uzat
+        options.AccessDeniedPath = "/Account/AccessDenied";
+        options.ExpireTimeSpan = TimeSpan.FromDays(7); 
+        options.SlidingExpiration = true; 
     });
 
 // MVC ve Razor Pages desteği
@@ -57,7 +60,7 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.Password.RequireLowercase = false;
     options.Password.RequiredUniqueChars = 1;
 
-    options.User.RequireUniqueEmail = true; // Kullanıcı oturumunun doğrulama ayarları
+    options.User.RequireUniqueEmail = true; 
 });
 
 builder.Services.AddAuthorization(options =>
@@ -76,7 +79,7 @@ using (var scope = app.Services.CreateScope())
     await SeedUsers.Initialize(scope.ServiceProvider);
 }
 
-// Configure the HTTP request pipeline.
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -90,7 +93,7 @@ app.UseRouting();
 app.UseMiddleware<ExceptionMiddleware>();
 
 
-// Kimlik doğrulama ve yetkilendirme middleware'lerini ekle
+
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -99,7 +102,7 @@ app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
 );
-// MVC route ayarı
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

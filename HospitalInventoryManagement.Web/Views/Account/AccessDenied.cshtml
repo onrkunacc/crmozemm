@@ -2,7 +2,12 @@
     ViewData["Title"] = "Erişim Reddedildi";
     Layout = null;
 }
+<!DOCTYPE html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
     <style>
         body {
             font-family: 'Poppins', sans-serif; /* Modern ve zarif yazı tipi */
@@ -21,7 +26,14 @@
             background-color: #ffffff; /* Kartın arka plan rengi */
             padding: 30px;
             max-width: 450px;
+            width: 100%;
+            text-align: center;
         }
+
+            .card img {
+                width: 150px;
+                margin-bottom: 20px;
+            }
 
         .card-body h1 {
             font-size: 2.2rem;
@@ -36,36 +48,36 @@
             line-height: 1.6;
         }
 
-        .btn-primary {
-            background-color: #3498db;
-            border: none;
-            font-size: 1rem;
-            padding: 12px 25px;
-            border-radius: 30px; /* Yumuşak buton köşeleri */
-            font-weight: 500;
-            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1); /* Buton gölgesi */
-            transition: all 0.3s ease-in-out;
+        .card-body .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            background-color: #f0f0f0;
+            color: #333;
+            border: 1px solid #ddd;
         }
 
-            .btn-primary:hover {
-                background-color: #2980b9;
-                box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-                transform: translateY(-2px); /* Hafif hover animasyonu */
+            .card-body .btn:hover {
+                background-color: #e0e0e0;
             }
     </style>
 </head>
 <body>
     <div class="card">
-        <div class="card-body text-center">
+        <img src="~/Modernize-1.0.0/src/assets/images/logos/logo.jpg" alt="Logo">
+        <div class="card-body">
             <h1 class="display-4">🚫 Erişim Reddedildi!</h1>
-            <br />
             <hr />
             <p>
                 Üzgünüz, bu sayfaya erişim izniniz bulunmamaktadır.<br>
                 Lütfen farklı bir sayfa deneyin veya ana sayfaya geri dönün.
             </p>
-            <br />
-            <a href="~/Home/Index" class="btn btn-primary mt-3">Ana Sayfaya Dön</a>
+            <a href="~/Home/Index" class="btn">Ana Sayfaya Dön</a>
         </div>
     </div>
 </body>
+</html>

@@ -34,7 +34,7 @@
 	<div class="row">
 		@foreach (var directory in Model)
 		{
-			<div class="col-md-3 mb-4">
+			<div class="col-md-4 mb-3">
 				<div class="card shadow-sm h-100">
 					<div class="card-header text-center">
 						<h5 class="card-title">@directory.CariName</h5>
@@ -48,15 +48,8 @@
 								{
 									<li class="mb-3">
 										<div class="d-flex justify-content-between">
-											<span class="text-truncate" style="max-width: 150px;">@file.FileName</span>
+											<span class="text-truncate" style="max-width: 250px;">@file.FileName</span>
 											<div class="btn-group">
-												<!-- İndir -->
-												<a href="@Url.Action("DownloadFile", "InvoiceFile",
-												   new { area = "Invoice", cariId = directory.CariId, year = yearFolder.Year, fileName = file.FileName })"
-												   class="btn btn-primary btn-sm">
-													<i class="fas fa-download"></i>
-												</a>
-
 												<a href="@Url.Action("UpdateFileView", "InvoiceFile",
 												   new { area = "Invoice", cariId = directory.CariId, year = yearFolder.Year, fileName = file.FileName })"
 												   class="btn btn-secondary btn-sm">

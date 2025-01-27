@@ -105,7 +105,7 @@ namespace HospitalInventoryManagement.Web.Controllers
                     break;
             }
 
-            // Stoklarý DTO'ya dönüþtürerek ViewModel'e ekle
+            
             viewModel.Stocks = stocks.Select(s => new StockDTO
             {
                 StockID = s.StockID,
@@ -117,6 +117,12 @@ namespace HospitalInventoryManagement.Web.Controllers
             }).ToList();
 
             return View(viewModel);
+        }
+
+        public IActionResult Error(string message)
+        {
+            ViewBag.ErrorMessage = message; 
+            return View();
         }
     }
 }

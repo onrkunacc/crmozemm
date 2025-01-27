@@ -5,7 +5,7 @@
 <div class="container mt-4">
 	<h2>Dosya Güncelle: @Model.FileName</h2>
 	<hr />
-	<form asp-action="UpdateFileView" asp-controller="InvoiceFile" asp-area="Invoice" method="post">
+	<form asp-action="UpdateFileView" asp-controller="InvoiceFile" method="post">
 		@Html.AntiForgeryToken()
 		<input type="hidden" asp-for="CariId" />
 		<input type="hidden" asp-for="Year" />
@@ -13,6 +13,8 @@
 		<input type="hidden" id="file-content" name="FileContent" />
 		<div id="editor-container" style="height: 700px; border: 1px solid #ccc;"></div>
 		<button type="submit" class="btn btn-success mt-3" onclick="syncContent()">Kaydet</button>
+		
+		<button type="button" class="btn btn-primary mt-3" onclick="printContent()">Yazdır</button>
 		<a href="@Url.Action("AllFiles", "InvoiceFile", new { area = "Invoice", cariId = Model.CariId, year = Model.Year })" class="btn btn-secondary mt-3">Geri Dön</a>
 	</form>
 </div>
@@ -20,9 +22,10 @@
 <!-- Quill and CSS -->
 <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/print-js/1.6.0/print.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/print-js/1.6.0/print.min.css">
 <script>
-	
+
 	var initialContent = `@Html.Raw(Model.FileContent ?? "")`;
 
 	var quill = new Quill('#editor-container', {
@@ -32,19 +35,70 @@
 				[{ 'header': [1, 2, false] }],
 				['bold', 'italic', 'underline'],
 				[{ 'list': 'ordered'}, { 'list': 'bullet' }],
-				[{ 'align': [] }], 
-				['clean'], 
-				['table'] 
+				[{ 'align': [] }],
+				['clean'],
+				['table']
 			]
 		}
 	});
 
-	
+
 	quill.clipboard.dangerouslyPasteHTML(initialContent);
 
-	
+
 	function syncContent() {
 		var content = quill.root.innerHTML;
 		document.getElementById('file-content').value = content;
 	}
+
+    function printContent() {
+        
+        var content = quill.root.innerHTML;
+
+        
+        var iframe = document.createElement('iframe');
+        document.body.appendChild(iframe);
+
+        
+        iframe.style.position = 'absolute';
+        iframe.style.top = '-9999px';
+
+        
+        var doc = iframe.contentDocument || iframe.contentWindow.document;
+        doc.open();
+        doc.write(`
+            <html>
+            <head>
+                <title>Yazdır</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        margin: 20px;
+                        line-height: 1.6;
+                        font-size: 14px;
+                        color: #000;
+                    }
+                    .ql-editor {
+                        line-height: 1.6;
+                        font-size: 14px;
+                        color: #000;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="ql-editor">
+                    ${content} <!-- Quill içeriğini iframe içine koy -->
+                </div>
+            </body>
+            </html>
+        `);
+        doc.close();
+
+       
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+
+        
+        document.body.removeChild(iframe);
+    }
 </script>

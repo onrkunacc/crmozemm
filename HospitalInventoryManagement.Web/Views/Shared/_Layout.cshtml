@@ -38,13 +38,6 @@
 						@if (User.IsInRole("Admin"))
 						{
 							<li class="sidebar-item">
-								<a class="sidebar-link" href="@Url.Action("Index","Admin")" aria-expanded="false">
-									<span><i class="ti ti-graph"></i></span>
-									<span class="hide-menu">Grafik</span>
-								</a>
-							</li>
-
-							<li class="sidebar-item">
 								<a class="sidebar-link" href="@Url.Action("UserList","Admin")" aria-expanded="false">
 									<span><i class="ti ti-user"></i></span>
 									<span class="hide-menu">Kullanıcılar</span>

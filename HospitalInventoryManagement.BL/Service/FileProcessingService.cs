@@ -13,10 +13,45 @@ namespace HospitalInventoryManagement.BL.Service
     {
         public string ConvertWordToFormattedHtml(string filePath)
         {
-            using (var wordDoc = WordprocessingDocument.Open(filePath, false))
+            try
             {
-                var body = wordDoc.MainDocumentPart.Document.Body;
-                return ConvertBodyToFormattedHtml(body);
+                // Dosyanın varlığını kontrol et
+                if (!System.IO.File.Exists(filePath))
+                {
+                    throw new FileNotFoundException($"Dosya bulunamadı: {filePath}");
+                }
+
+                // Dosyanın boş olup olmadığını kontrol et
+                var fileInfo = new FileInfo(filePath);
+                if (fileInfo.Length == 0)
+                {
+                    throw new FileFormatException("Dosya boş olduğu için işlenemiyor.");
+                }
+
+                // Word dosyasını aç ve içeriği HTML'e dönüştür
+                using (var wordDoc = WordprocessingDocument.Open(filePath, false))
+                {
+                    var body = wordDoc.MainDocumentPart.Document.Body;
+                    return ConvertBodyToFormattedHtml(body);
+                }
+            }
+            catch (FileNotFoundException ex)
+            {
+                Console.WriteLine($"Hata: {ex.Message}");
+                // Hata sayfasına yönlendirme veya loglama yapılabilir
+                throw new Exception("Dosya bulunamadı. Lütfen geçerli bir dosya yükleyin.");
+            }
+            catch (FileFormatException ex)
+            {
+                Console.WriteLine($"Hata: {ex.Message}");
+                // Hata sayfasına yönlendirme
+                throw new Exception("Dosya formatı desteklenmiyor veya dosya boş.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Beklenmeyen hata: {ex.Message}");
+                // Genel hata yönetimi
+                throw new Exception("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen daha sonra tekrar deneyin.");
             }
         }
 
@@ -25,16 +60,20 @@ namespace HospitalInventoryManagement.BL.Service
             using (var wordDoc = WordprocessingDocument.Open(filePath, true))
             {
                 var body = wordDoc.MainDocumentPart.Document.Body;
+
+                // Word içeriğini temizleyelim
                 body.RemoveAllChildren();
 
+                // HTML içeriğini bölerek paragraf olarak ekleyelim
                 var paragraphs = htmlContent.Split(new[] { "<p>", "</p>" }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (var paragraph in paragraphs)
                 {
                     var p = new Paragraph(new Run(new Text(paragraph.Trim())));
                     body.AppendChild(p);
                 }
-                wordDoc.MainDocumentPart.Document.Save();
 
+                // Belgeyi kaydedelim
+                wordDoc.MainDocumentPart.Document.Save();
             }
         }
 
