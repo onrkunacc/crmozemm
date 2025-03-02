@@ -20,7 +20,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Identity ayarları
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()  // Rollerle birlikte kimlik doğrulama
     .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultTokenProviders();  // Şifre sıfırlama ve e-posta doğrulama gibi işlemler için token sağlayıcı
+    .AddDefaultTokenProviders();  
 
 
 
@@ -76,7 +76,7 @@ using (var scope = app.Services.CreateScope())
 {
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-    await SeedUsers.Initialize(scope.ServiceProvider);
+    
 }
 
 

@@ -14,14 +14,6 @@
             activeUserMessage = "Aktif Kullanıcı: Admin";
             roleBasedMessage = "Yönetici Paneli";
         }
-        else if (await UserManager.IsInRoleAsync(user, "DocumentRole"))
-        {
-            activeUserMessage = "Aktif Kullanıcı: Evrak Takip Kullanıcısı";
-        }
-        else if (await UserManager.IsInRoleAsync(user, "InvoiceRole"))
-        {
-            activeUserMessage = "Aktif Kullanıcı: Fatura Takip Kullanıcısı";
-        }
         else
         {
             var hospital = Context.Hospitals.FirstOrDefault(h => h.HospitalID == user.HospitalID);

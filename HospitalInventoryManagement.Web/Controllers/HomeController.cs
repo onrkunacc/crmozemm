@@ -69,16 +69,17 @@ namespace HospitalInventoryManagement.Web.Controllers
         // Admin Ana Sayfa
         [Authorize(Roles = "Admin")]
         [HttpGet]
-        public IActionResult AdminIndex(int? hospitalId, string sortOrder)
+        public IActionResult AdminIndex(int? hospitalId, string sortOrder, int pageNumber = 1, int pageSize = 50)
         {
             var viewModel = new AdminStockListViewModel
             {
                 Hospitals = new SelectList(_context.Hospitals, "HospitalID", "HospitalName"),
                 SelectedHospitalID = hospitalId,
-                SortOrder = sortOrder
+                SortOrder = sortOrder,
+                PageNumber = pageNumber,
+                PageSize = pageSize
             };
 
-            // Tüm stoklarý veya seçili hastanenin stoklarýný al
             var stocks = _stockService.GetAllStocks();
 
             if (hospitalId.HasValue)
@@ -86,7 +87,6 @@ namespace HospitalInventoryManagement.Web.Controllers
                 stocks = stocks.Where(s => s.HospitalID == hospitalId.Value).ToList();
             }
 
-            // Sýralama seçenekleri
             switch (sortOrder)
             {
                 case "NameAsc":
@@ -101,11 +101,12 @@ namespace HospitalInventoryManagement.Web.Controllers
                 case "DateDesc":
                     stocks = stocks.OrderByDescending(s => s.LastUpdated).ToList();
                     break;
-                default:
-                    break;
             }
 
-            
+            viewModel.TotalCount = stocks.Count;
+
+            stocks = stocks.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+
             viewModel.Stocks = stocks.Select(s => new StockDTO
             {
                 StockID = s.StockID,

@@ -1,24 +1,38 @@
 ﻿@model HospitalInventoryManagement.Web.ViewModel.AdminStockListViewModel
-@{
-    ViewData["Title"] = "Anasayfa";
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
 
-<h1>Hastane Stok Takip</h1>
+<h1>Hastane Stokları</h1>
 <br />
 <form method="get">
-    <label for="hospitalId" class="form-label">Hastane Seç:</label>
-    <select name="hospitalId" asp-for="SelectedHospitalID" asp-items="Model.Hospitals" onchange="this.form.submit()" class="form-control">
-        <option value="">Tüm Hastaneler</option>
-    </select>
-    <br />
-    <label for="sortOrder" class="form-label">Sıralama:</label>
-    <button class="btn btn-outline-dark" type="submit" name="sortOrder" value="NameAsc"><strong>Ürün Adı ↑</strong></button>&nbsp;
-    <button class="btn btn-outline-dark" type="submit" name="sortOrder" value="NameDesc"><strong>Ürün Adı ↓</strong></button>&nbsp;
-    <button class="btn btn-outline-dark" type="submit" name="sortOrder" value="DateAsc"><strong>Tarih ↑</strong></button>&nbsp;
-    <button class="btn btn-outline-dark" type="submit" name="sortOrder" value="DateDesc"><strong>Tarih ↓</strong></button>
+    <input type="hidden" name="pageNumber" value="1" />
+
+    <div class="mb-3">
+        <label for="hospitalId" class="form-label">Hastane Seç:</label>
+        <select name="hospitalId" asp-for="SelectedHospitalID" asp-items="Model.Hospitals" onchange="this.form.submit()" class="form-control">
+            <option value="">Tüm Hastaneler</option>
+        </select>
+    </div>
+
+    <!-- Sıralama ve Kayıt Sayısı Alanlarını Aynı Satıra Alalım -->
+    <div class="d-flex align-items-center mb-3 gap-2 flex-wrap">
+        <div class="d-flex align-items-center gap-2">
+            <label class="form-label me-2">Sıralama:</label>
+            <button class="btn btn-outline-dark btn-sm" type="submit" name="sortOrder" value="NameAsc">Ürün Adı ↑</button>
+            <button class="btn btn-outline-dark btn-sm" type="submit" name="sortOrder" value="NameDesc">Ürün Adı ↓</button>
+            <button class="btn btn-outline-dark btn-sm" type="submit" name="sortOrder" value="DateAsc">Tarih ↑</button>
+            <button class="btn btn-outline-dark btn-sm" type="submit" name="sortOrder" value="DateDesc">Tarih ↓</button>
+        </div>
+
+        <div class="ms-auto">
+            <label for="pageSize" class="form-label me-2">Gösterilecek Kayıt:</label>
+            <select name="pageSize" class="form-select form-select-sm d-inline-block w-auto" onchange="this.form.submit()">
+                <option value="20" selected="@(Model.PageSize == 20 ? "selected" : null)">20</option>
+                <option value="50" selected="@(Model.PageSize == 50 ? "selected" : null)">50</option>
+                <option value="100" selected="@(Model.PageSize == 100 ? "selected" : null)">100</option>
+            </select>
+        </div>
+    </div>
 </form>
-<br />
+
 <table class="table">
     <thead>
         <tr>
@@ -42,3 +56,17 @@
         }
     </tbody>
 </table>
+
+<nav>
+    <ul class="pagination">
+        @for (int i = 1; i <= (int)Math.Ceiling((double)Model.TotalCount / Model.PageSize); i++)
+        {
+            <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                <a class="page-link"
+                   href="@Url.Action("AdminIndex", new { hospitalId = Model.SelectedHospitalID, sortOrder = Model.SortOrder, pageNumber = i, pageSize = Model.PageSize })">
+                    @i
+                </a>
+            </li>
+        }
+    </ul>
+</nav>
