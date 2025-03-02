@@ -36,21 +36,28 @@ namespace HospitalInventoryManagement.Web.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            // Admin kontrolü yaparak admin kullanýcýlarý AdminIndex'e yönlendir
             if (await _userManager.IsInRoleAsync(user, "Admin"))
             {
                 return RedirectToAction("AdminIndex");
             }
 
-            // Kullanýcýnýn HospitalID'sine göre stoðu azalan ürünleri getir
-            var lowStockItems = _stockService.GetStocksByHospital(user.HospitalID)
-                                             .Where(s => s.Quantity < 10)
-                                             .OrderBy(s => s.Quantity)
-                                             .Take(10)
-                                             .ToList();
+            var today = DateTime.Now;
+            var thresholdDate = today.AddDays(30); // 30 gün içinde miadý dolacak
 
-            // Stok verileri
-            var stockData = _stockService.GetStocksByHospital(user.HospitalID)
+            var allStocks = _stockService.GetStocksByHospital(user.HospitalID).ToList();
+
+            var lowStockItems = allStocks
+                .Where(s => s.Quantity < 10)
+                .OrderBy(s => s.Quantity)
+                .Take(10)
+                .ToList();
+
+            var expiringSoonItems = allStocks
+                .Where(s => s.ExpiryDate <= thresholdDate && s.ExpiryDate >= today)
+                .OrderBy(s => s.ExpiryDate)
+                .ToList();
+
+            var stockData = allStocks
                 .Select(s => new StockChartData
                 {
                     ProductName = s.Product.ProductName,
@@ -60,11 +67,13 @@ namespace HospitalInventoryManagement.Web.Controllers
             var viewModel = new HomeViewModel
             {
                 LowStockItems = lowStockItems,
+                ExpiringSoonItems = expiringSoonItems,
                 StockData = stockData
             };
 
             return View(viewModel);
         }
+        
 
         // Admin Ana Sayfa
         [Authorize(Roles = "Admin")]

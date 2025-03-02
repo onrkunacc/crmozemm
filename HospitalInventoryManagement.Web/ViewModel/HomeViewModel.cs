@@ -8,6 +8,7 @@ namespace HospitalInventoryManagement.Web.ViewModel
         public List<Stock> LowStockItems { get; set; }
         public List<MonthlyStatisticsViewModel> StatisticsData { get; set; }
         public List<StockChartData> StockData { get; set; }
+        public List<Stock> ExpiringSoonItems { get; set; }
     }
 
     public class StockChartData

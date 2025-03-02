@@ -1,29 +1,60 @@
-﻿@model HomeViewModel
-@{
-    ViewData["Title"] = "Ana Sayfa";
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
+﻿@model HospitalInventoryManagement.Web.ViewModel.HomeViewModel
 
 <div class="container-fluid">
-    <h1>Ana Sayfa</h1>
+    <h1 class="mb-4">Ana Sayfa</h1>
 
-    <!-- Stoğu Azalan Ürünler -->
-    <div class="card mt-4">
-        <div class="card-header">Stoğu Azalan Ürünler</div>
-        <div class="card-body">
-          
-            <ul>
-                @foreach (var item in Model.LowStockItems)
-                {
-                    <li>@item.Product.ProductName - Miktar: @item.Quantity</li>
-                }
-            </ul>
+    <div class="row g-3">
+        <!-- g-3: Bootstrap grid gap ekler, kartlar arası mesafe -->
+        <!-- Stoğu Azalan Ürünler Kartı -->
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <!-- shadow-sm: Hafif gölge -->
+                <div class="card-header bg-primary text-white">Stoğu Azalan Ürünler</div>
+                <div class="card-body" style="padding: 15px;">
+                    <ul class="list-unstyled" style="line-height: 1.8;">
+                        @if (Model.LowStockItems.Any())
+                        {
+                            @foreach (var item in Model.LowStockItems)
+                            {
+                                <li><strong>@item.Product.ProductName</strong> - Miktar: @item.Quantity</li>
+                            }
+                        }
+                        else
+                        {
+                            <li>Tüm ürünler yeterli stokta.</li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Miadı Yaklaşan Ürünler Kartı -->
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100" style="background-color: #ffe5e5;">
+                <!-- Açık kırmızı arka plan -->
+                <div class="card-header bg-danger text-white">Miadı Yaklaşan Ürünler</div>
+                <div class="card-body" style="padding: 15px;">
+                    <ul class="list-unstyled" style="line-height: 1.8;">
+                        @if (Model.ExpiringSoonItems.Any())
+                        {
+                            @foreach (var item in Model.ExpiringSoonItems)
+                            {
+                                <li><strong>@item.Product.ProductName</strong> - Son Kullanma: @item.ExpiryDate.ToString("dd.MM.yyyy")</li>
+                            }
+                        }
+                        else
+                        {
+                            <li>Miadı yaklaşan ürün bulunmamaktadır.</li>
+                        }
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Stok Grafik -->
-    <div class="card mt-4">
-        <div class="card-header">Stok Durumu</div>
+    <div class="card mt-4 shadow-sm">
+        <div class="card-header bg-info text-white">Stok Durumu</div>
         <div class="card-body">
             <canvas id="stockChart"></canvas>
         </div>
@@ -33,17 +64,13 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        // Stok verileri
         var stockData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.StockData));
+        var labels = stockData.map(stock => stock.ProductName);
+        var data = stockData.map(stock => stock.Quantity);
 
-        // Ürün adları ve stok miktarlarını hazırlama
-        var labels = stockData.map(stock => stock.ProductName); // Ürün adları
-        var data = stockData.map(stock => stock.Quantity); // Stok miktarları
-
-        // Chart.js ile grafik oluşturma
         var ctx = document.getElementById('stockChart').getContext('2d');
         new Chart(ctx, {
-            type: 'bar', // Bar grafiği
+            type: 'bar',
             data: {
                 labels: labels,
                 datasets: [{
@@ -58,17 +85,12 @@
                 responsive: true,
                 scales: {
                     y: {
-                        beginAtZero: true // Y ekseni sıfırdan başlar
+                        beginAtZero: true
                     }
                 },
                 plugins: {
-                    legend: {
-                        position: 'top'
-                    },
-                    title: {
-                        display: true,
-                        text: 'Hastane Stok Grafiği'
-                    }
+                    legend: { position: 'top' },
+                    title: { display: true, text: 'Hastane Stok Grafiği' }
                 }
             }
         });
