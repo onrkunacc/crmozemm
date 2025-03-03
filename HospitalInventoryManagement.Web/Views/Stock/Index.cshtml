@@ -75,12 +75,14 @@
 
 <body>
     <h1>Stok Listesi</h1>
-
+    <div class="mb-3">
+        <a href="@Url.Action("ExportToPdf", "Report")" class="btn btn-danger btn-sm">PDF İndir</a>
+    </div>
     <form method="get" asp-action="Index" class="form-inline">
         <input type="text" name="searchQuery" value="@ViewBag.SearchQuery" class="form-control" placeholder="Ürün adı ile arayın">
         <button type="submit" class="btn btn-primary">Ara</button>
     </form>
-
+    
     @if (!Model.Any())
     {
         <p class="no-results">Arama kriterlerinize uygun stok bulunamadı.</p>
