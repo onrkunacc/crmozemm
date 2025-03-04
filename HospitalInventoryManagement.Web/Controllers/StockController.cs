@@ -643,11 +643,30 @@ namespace HospitalInventoryManagement.Web.Controllers
                     return RedirectToAction("ManageFlacon", new { id = model.StockID });
                 }
 
+                // Flakon çıkışı
                 stock.FlaconCount -= model.ChangeAmount;
+
+                // Eğer flakonlar tamamen bittiyse, kutu (quantity) azalt
+                while (stock.FlaconCount <= 0 && stock.Quantity > 0)
+                {
+                    stock.Quantity -= 1;
+
+                    // Yeni kutuya geçiş: flakon sayısını ürünün kutu başına flakon sayısına eşitle
+                    stock.FlaconCount = stock.Product.FlaconCountPerBox;
+
+                    if (stock.Quantity == 0)
+                    {
+                        // Eğer quantity 0 olduysa, stoğu kaldırabilirsin (opsiyonel)
+                        _stockService.DeleteStock(stock.StockID);
+                        TempData["SuccessMessage"] = "Stok tamamen tükendi ve kaldırıldı.";
+                        return RedirectToAction("Index");
+                    }
+                }
+
+                // Normal güncelleme
                 _stockService.UpdateStock(stock);
 
-
-                TempData["SuccessMessage"] = $"Flakon sayısı başarıyla güncellendi. Kalan flakon: {stock.FlaconCount}";
+                TempData["SuccessMessage"] = $"Flakon çıkışı yapıldı. Kalan flakon: {stock.FlaconCount}, Kalan Kutu: {stock.Quantity}";
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
@@ -657,5 +676,6 @@ namespace HospitalInventoryManagement.Web.Controllers
                 return RedirectToAction("Index");
             }
         }
+
     }
 }
