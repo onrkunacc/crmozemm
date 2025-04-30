@@ -397,7 +397,7 @@ namespace HospitalInventoryManagement.Web.Controllers
                     return View(viewModel);
                 }
 
-                // Aynı ProductID ve LotNumber olup olmadığını kontrol et
+                
                 var existingStock = _context.Stocks.FirstOrDefault(s =>
                     s.ProductID == product.ProductID &&
                     s.LotNumber == viewModel.LotNumber &&
@@ -405,7 +405,6 @@ namespace HospitalInventoryManagement.Web.Controllers
 
                 if (existingStock != null)
                 {
-                    // Mevcut stoğu güncelle
                     existingStock.Quantity += viewModel.Quantity;
                     existingStock.ExpiryDate = viewModel.ExpiryDate;
                     existingStock.LastUpdated = DateTime.Now;
